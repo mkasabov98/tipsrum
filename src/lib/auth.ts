@@ -1,12 +1,12 @@
-import { betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
-import { db } from '@/db';
-import * as schema from '@/db/schema';
+import { db } from "@/db";
+import * as schema from "@/db/schema";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: 'pg',
+    provider: "pg",
     schema: {
       user: schema.user,
       session: schema.session,
@@ -22,24 +22,24 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       username: {
-        type: 'string',
+        type: "string",
         required: false,
       },
       // input: false is load-bearing - it stops a client from setting its own
       // entitlement at registration. Premium is granted only by the Phase 5
       // billing webhooks.
       entitlement: {
-        type: 'string',
+        type: "string",
         required: false,
-        defaultValue: 'free',
+        defaultValue: "free",
         input: false,
       },
       termsAcceptedAt: {
-        type: 'date',
+        type: "date",
         required: false,
       },
       marketingOptIn: {
-        type: 'boolean',
+        type: "boolean",
         required: false,
         defaultValue: false,
       },
