@@ -42,3 +42,6 @@ next-env.d.ts
 
 # claude code local settings
 .claude/settings.local.json
+
+# committed env template
+!.env.example
