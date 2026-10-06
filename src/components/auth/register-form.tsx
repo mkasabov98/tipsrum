@@ -24,48 +24,110 @@ import { isValidUsername } from "@/lib/username";
 
 const inlineLink = "text-primary underline-offset-4 hover:underline";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type Values = {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  termsAccepted: boolean;
+  // Optional by design: never part of validation.
+  marketingOptIn: boolean;
+};
+
+type Errors = Partial<Record<keyof Values, string>>;
+
+const EMPTY: Values = {
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  termsAccepted: false,
+  marketingOptIn: false,
+};
+
+/** Recomputed on every render, so fixing one field clears its message immediately. */
+function validate(values: Values): Errors {
+  const errors: Errors = {};
+
+  if (!values.username.trim()) {
+    errors.username = "Въведи потребителско име.";
+  } else if (!isValidUsername(values.username.trim())) {
+    errors.username = authErrorMessage({ code: "INVALID_USERNAME" });
+  }
+
+  if (!values.email.trim()) {
+    errors.email = "Въведи имейл.";
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = authErrorMessage({ code: "INVALID_EMAIL" });
+  }
+
+  if (!values.password) {
+    errors.password = "Въведи парола.";
+  } else if (values.password.length < 8) {
+    errors.password = authErrorMessage({ code: "PASSWORD_TOO_SHORT" });
+  }
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = "Потвърди паролата.";
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = "Паролите не съвпадат.";
+  }
+
+  if (!values.termsAccepted) {
+    errors.termsAccepted = authErrorMessage({ code: "TERMS_NOT_ACCEPTED" });
+  }
+
+  return errors;
+}
+
 export function RegisterForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [marketingOptIn, setMarketingOptIn] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [values, setValues] = useState<Values>(EMPTY);
+  const [touched, setTouched] = useState<
+    Partial<Record<keyof Values, boolean>>
+  >({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  const errors = validate(values);
+  const isValid = Object.keys(errors).length === 0;
+
+  // A field only shows its error once the user has left it, so the form doesn't
+  // shout at someone who is still typing their first character.
+  const errorFor = (field: keyof Values) =>
+    touched[field] ? errors[field] : undefined;
+
+  const field = (name: keyof Values) => ({
+    value: values[name] as string,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      const next = event.target.value;
+      setValues((current) => ({ ...current, [name]: next }));
+    },
+    onBlur: () => setTouched((current) => ({ ...current, [name]: true })),
+    error: errorFor(name),
+  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    const username = String(form.get("username")).trim();
-    const password = String(form.get("password"));
+    if (!isValid || pending) return;
 
-    // Client-side checks give instant feedback; the server enforces all of them again.
-    if (!isValidUsername(username)) {
-      return setError(authErrorMessage({ code: "INVALID_USERNAME" }));
-    }
-    if (password.length < 8) {
-      return setError(authErrorMessage({ code: "PASSWORD_TOO_SHORT" }));
-    }
-    if (password !== form.get("confirmPassword")) {
-      return setError("Паролите не съвпадат.");
-    }
-    if (!termsAccepted) {
-      return setError(authErrorMessage({ code: "TERMS_NOT_ACCEPTED" }));
-    }
-
-    setError(null);
+    setServerError(null);
     setPending(true);
 
     const { error } = await authClient.signUp.email({
-      name: username,
-      username,
-      email: String(form.get("email")),
-      password,
-      marketingOptIn,
+      name: values.username.trim(),
+      username: values.username.trim(),
+      email: values.email.trim(),
+      password: values.password,
+      marketingOptIn: values.marketingOptIn,
       // Not stored as-is: the server checks it and stamps termsAcceptedAt itself.
       termsAccepted: true,
     } as Parameters<typeof authClient.signUp.email>[0]);
 
     if (error) {
-      setError(authErrorMessage(error));
+      setServerError(authErrorMessage(error));
       setPending(false);
       return;
     }
@@ -81,24 +143,22 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
           Безплатно е и отнема по-малко от 30 секунди.
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="grid gap-4">
-          {error && <FormAlert>{error}</FormAlert>}
+          {serverError && <FormAlert>{serverError}</FormAlert>}
           <TextField
             id="username"
             label="Потребителско име"
             autoComplete="username"
             hint="3–30 символа: латински букви, цифри, точка, долна черта или тире."
-            required
-            minLength={3}
-            maxLength={30}
+            {...field("username")}
           />
           <TextField
             id="email"
             label="Имейл"
             type="email"
             autoComplete="email"
-            required
+            {...field("email")}
           />
           <TextField
             id="password"
@@ -106,21 +166,23 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
             type="password"
             autoComplete="new-password"
             hint="Поне 8 символа."
-            required
-            minLength={8}
+            {...field("password")}
           />
           <TextField
             id="confirmPassword"
             label="Потвърди паролата"
             type="password"
             autoComplete="new-password"
-            required
-            minLength={8}
+            {...field("confirmPassword")}
           />
           <CheckboxField
             id="termsAccepted"
-            checked={termsAccepted}
-            onCheckedChange={setTermsAccepted}
+            checked={values.termsAccepted}
+            onCheckedChange={(checked) => {
+              setValues((current) => ({ ...current, termsAccepted: checked }));
+              setTouched((current) => ({ ...current, termsAccepted: true }));
+            }}
+            error={errorFor("termsAccepted")}
           >
             <span>
               Приемам{" "}
@@ -136,14 +198,20 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
           </CheckboxField>
           <CheckboxField
             id="marketingOptIn"
-            checked={marketingOptIn}
-            onCheckedChange={setMarketingOptIn}
+            checked={values.marketingOptIn}
+            onCheckedChange={(checked) =>
+              setValues((current) => ({ ...current, marketingOptIn: checked }))
+            }
           >
             Искам да получавам безплатни прогнози, оферти и новини по имейл.
           </CheckboxField>
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={!isValid || pending}
+          >
             {pending ? "Регистриране…" : "Регистрирай се"}
           </Button>
           <p className="text-muted-foreground text-sm">
