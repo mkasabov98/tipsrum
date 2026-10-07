@@ -5,8 +5,8 @@ import { useState } from "react";
 
 import {
   FormAlert,
+  PasswordField,
   SubmitButton,
-  TextField,
 } from "@/components/auth/form-parts";
 import { type FieldErrors, useAuthForm } from "@/components/auth/use-auth-form";
 import {
@@ -115,18 +115,16 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
         <form onSubmit={handleSubmit} noValidate>
           <CardContent className="grid gap-4">
             {serverError && <FormAlert>{serverError}</FormAlert>}
-            <TextField
+            <PasswordField
               id="password"
               label="Нова парола"
-              type="password"
               autoComplete="new-password"
               hint="Поне 8 символа, с главна и малка буква, цифра и символ."
               {...field("password")}
             />
-            <TextField
+            <PasswordField
               id="confirmPassword"
               label="Потвърди паролата"
-              type="password"
               autoComplete="new-password"
               {...field("confirmPassword")}
             />

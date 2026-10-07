@@ -8,6 +8,7 @@ import {
   CheckboxField,
   EMAIL_PATTERN,
   FormAlert,
+  PasswordField,
   SubmitButton,
   TextField,
 } from "@/components/auth/form-parts";
@@ -124,18 +125,16 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
             autoComplete="email"
             {...field("email")}
           />
-          <TextField
+          <PasswordField
             id="password"
             label="Парола"
-            type="password"
             autoComplete="new-password"
             hint="Поне 8 символа, с главна и малка буква, цифра и символ."
             {...field("password")}
           />
-          <TextField
+          <PasswordField
             id="confirmPassword"
             label="Потвърди паролата"
-            type="password"
             autoComplete="new-password"
             {...field("confirmPassword")}
           />

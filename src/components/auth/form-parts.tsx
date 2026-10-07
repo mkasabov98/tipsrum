@@ -1,3 +1,8 @@
+"use client";
+
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -77,6 +82,8 @@ type TextFieldProps = React.ComponentProps<typeof Input> & {
   label: string;
   hint?: string;
   error?: string | null;
+  /** Rendered inside the field, against its right edge. */
+  trailing?: React.ReactNode;
 };
 
 export function TextField({
@@ -84,6 +91,7 @@ export function TextField({
   label,
   hint,
   error,
+  trailing,
   ...inputProps
 }: TextFieldProps) {
   const hintId = hint ? `${id}-hint` : undefined;
@@ -93,13 +101,21 @@ export function TextField({
   return (
     <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
-      <Input
-        id={id}
-        name={id}
-        aria-invalid={!!error}
-        aria-describedby={describedBy}
-        {...inputProps}
-      />
+      <div className="relative">
+        <Input
+          id={id}
+          name={id}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
+          className={trailing ? "pr-9" : undefined}
+          {...inputProps}
+        />
+        {trailing && (
+          <span className="absolute inset-y-0 right-1 flex items-center">
+            {trailing}
+          </span>
+        )}
+      </div>
       {hint && (
         <p id={hintId} className="text-muted-foreground text-xs">
           {hint}
@@ -107,6 +123,39 @@ export function TextField({
       )}
       {error && <FieldError id={errorId}>{error}</FieldError>}
     </div>
+  );
+}
+
+/**
+ * Password field with a show/hide toggle. The toggle is a real button so it is
+ * keyboard reachable, but it preventDefaults mousedown so clicking it doesn't
+ * pull focus out of the input - otherwise the field would blur and show its
+ * error just because someone wanted to check what they typed.
+ */
+export function PasswordField(
+  props: Omit<TextFieldProps, "trailing" | "type">,
+) {
+  const [visible, setVisible] = useState(false);
+  const Icon = visible ? EyeOffIcon : EyeIcon;
+
+  return (
+    <TextField
+      {...props}
+      type={visible ? "text" : "password"}
+      trailing={
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => setVisible((current) => !current)}
+          aria-label={visible ? "Скрий паролата" : "Покажи паролата"}
+          aria-pressed={visible}
+          aria-controls={props.id}
+          className="text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-md p-1.5 outline-none focus-visible:ring-3"
+        >
+          <Icon className="size-4" aria-hidden="true" />
+        </button>
+      }
+    />
   );
 }
 

@@ -8,6 +8,7 @@ import {
   CheckboxField,
   EMAIL_PATTERN,
   FormAlert,
+  PasswordField,
   SubmitButton,
   TextField,
 } from "@/components/auth/form-parts";
@@ -98,10 +99,9 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
             {...field("email")}
           />
           <div className="grid gap-2">
-            <TextField
+            <PasswordField
               id="password"
               label="Парола"
-              type="password"
               autoComplete="current-password"
               {...field("password")}
             />
