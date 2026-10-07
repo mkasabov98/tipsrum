@@ -6,10 +6,12 @@ import { useState } from "react";
 
 import {
   CheckboxField,
+  EMAIL_PATTERN,
   FormAlert,
+  SubmitButton,
   TextField,
 } from "@/components/auth/form-parts";
-import { Button } from "@/components/ui/button";
+import { type FieldErrors, useAuthForm } from "@/components/auth/use-auth-form";
 import {
   Card,
   CardContent,
@@ -21,26 +23,51 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage } from "@/lib/auth-errors";
 
+type Values = {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+};
+
+const EMPTY: Values = { email: "", password: "", rememberMe: true };
+
+function validate(values: Values): FieldErrors<Values> {
+  const errors: FieldErrors<Values> = {};
+
+  if (!values.email.trim()) {
+    errors.email = "Въведи имейл.";
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = authErrorMessage({ code: "INVALID_EMAIL" });
+  }
+
+  // Deliberately no strength rules here: an existing password only has to be
+  // entered, and checking its shape at login would tell an attacker the policy.
+  if (!values.password) errors.password = "Въведи парола.";
+
+  return errors;
+}
+
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
-  const [rememberMe, setRememberMe] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { values, isValid, field, checkbox } = useAuthForm(EMPTY, validate);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setError(null);
+    if (!isValid || pending) return;
+
+    setServerError(null);
     setPending(true);
 
     const { error } = await authClient.signIn.email({
-      email: String(form.get("email")),
-      password: String(form.get("password")),
-      rememberMe,
+      email: values.email.trim(),
+      password: values.password,
+      rememberMe: values.rememberMe,
     });
 
     if (error) {
-      setError(authErrorMessage(error));
+      setServerError(authErrorMessage(error));
       setPending(false);
       return;
     }
@@ -60,15 +87,15 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         <CardTitle className="text-xl">Вход</CardTitle>
         <CardDescription>Влез в профила си в Tipsrum.</CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} noValidate>
         <CardContent className="grid gap-4">
-          {error && <FormAlert>{error}</FormAlert>}
+          {serverError && <FormAlert>{serverError}</FormAlert>}
           <TextField
             id="email"
             label="Имейл"
             type="email"
             autoComplete="email"
-            required
+            {...field("email")}
           />
           <div className="grid gap-2">
             <TextField
@@ -76,7 +103,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
               label="Парола"
               type="password"
               autoComplete="current-password"
-              required
+              {...field("password")}
             />
             <Link
               href="/forgot_password"
@@ -85,18 +112,18 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
               Забравена парола?
             </Link>
           </div>
-          <CheckboxField
-            id="rememberMe"
-            checked={rememberMe}
-            onCheckedChange={setRememberMe}
-          >
+          <CheckboxField id="rememberMe" {...checkbox("rememberMe")}>
             Запомни ме
           </CheckboxField>
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-4">
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Влизане…" : "Влез"}
-          </Button>
+          <SubmitButton
+            disabled={!isValid}
+            pending={pending}
+            pendingLabel="Влизане…"
+          >
+            Влез
+          </SubmitButton>
           <p className="text-muted-foreground text-sm">
             Нямаш профил?{" "}
             <Link

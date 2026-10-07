@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { FormAlert, TextField } from "@/components/auth/form-parts";
-import { Button } from "@/components/ui/button";
+import {
+  EMAIL_PATTERN,
+  FormAlert,
+  SubmitButton,
+  TextField,
+} from "@/components/auth/form-parts";
+import { type FieldErrors, useAuthForm } from "@/components/auth/use-auth-form";
 import {
   Card,
   CardContent,
@@ -16,25 +21,39 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage } from "@/lib/auth-errors";
 
+type Values = { email: string };
+
+function validate(values: Values): FieldErrors<Values> {
+  const errors: FieldErrors<Values> = {};
+  if (!values.email.trim()) {
+    errors.email = "Въведи имейл.";
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = authErrorMessage({ code: "INVALID_EMAIL" });
+  }
+  return errors;
+}
+
 export function ForgotPasswordForm() {
+  const { values, isValid, field } = useAuthForm({ email: "" }, validate);
   const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    setError(null);
+    if (!isValid || pending) return;
+
+    setServerError(null);
     setPending(true);
 
     const { error } = await authClient.requestPasswordReset({
-      email: String(form.get("email")),
+      email: values.email.trim(),
       redirectTo: "/reset_password",
     });
 
     setPending(false);
     if (error) {
-      setError(authErrorMessage(error));
+      setServerError(authErrorMessage(error));
       return;
     }
     setSent(true);
@@ -58,21 +77,25 @@ export function ForgotPasswordForm() {
           </FormAlert>
         </CardContent>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <CardContent className="grid gap-4">
-            {error && <FormAlert>{error}</FormAlert>}
+            {serverError && <FormAlert>{serverError}</FormAlert>}
             <TextField
               id="email"
               label="Имейл"
               type="email"
               autoComplete="email"
-              required
+              {...field("email")}
             />
           </CardContent>
           <CardFooter className="mt-6">
-            <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? "Изпращане…" : "Изпрати линк"}
-            </Button>
+            <SubmitButton
+              disabled={!isValid}
+              pending={pending}
+              pendingLabel="Изпращане…"
+            >
+              Изпрати линк
+            </SubmitButton>
           </CardFooter>
         </form>
       )}

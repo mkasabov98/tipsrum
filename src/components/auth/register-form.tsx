@@ -6,10 +6,12 @@ import { useState } from "react";
 
 import {
   CheckboxField,
+  EMAIL_PATTERN,
   FormAlert,
+  SubmitButton,
   TextField,
 } from "@/components/auth/form-parts";
-import { Button } from "@/components/ui/button";
+import { type FieldErrors, useAuthForm } from "@/components/auth/use-auth-form";
 import {
   Card,
   CardContent,
@@ -24,8 +26,6 @@ import { passwordProblem } from "@/lib/password";
 
 const inlineLink = "text-primary underline-offset-4 hover:underline";
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 type Values = {
   email: string;
   password: string;
@@ -35,8 +35,6 @@ type Values = {
   marketingOptIn: boolean;
 };
 
-type Errors = Partial<Record<keyof Values, string>>;
-
 const EMPTY: Values = {
   email: "",
   password: "",
@@ -45,9 +43,8 @@ const EMPTY: Values = {
   marketingOptIn: false,
 };
 
-/** Recomputed on every render, so fixing one field clears its message immediately. */
-function validate(values: Values): Errors {
-  const errors: Errors = {};
+function validate(values: Values): FieldErrors<Values> {
+  const errors: FieldErrors<Values> = {};
 
   if (!values.email.trim()) {
     errors.email = "Въведи имейл.";
@@ -77,30 +74,9 @@ function validate(values: Values): Errors {
 
 export function RegisterForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
-  const [values, setValues] = useState<Values>(EMPTY);
-  const [touched, setTouched] = useState<
-    Partial<Record<keyof Values, boolean>>
-  >({});
+  const { values, isValid, field, checkbox } = useAuthForm(EMPTY, validate);
   const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-
-  const errors = validate(values);
-  const isValid = Object.keys(errors).length === 0;
-
-  // A field only shows its error once the user has left it, so the form doesn't
-  // shout at someone who is still typing their first character.
-  const errorFor = (field: keyof Values) =>
-    touched[field] ? errors[field] : undefined;
-
-  const field = (name: keyof Values) => ({
-    value: values[name] as string,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-      const next = event.target.value;
-      setValues((current) => ({ ...current, [name]: next }));
-    },
-    onBlur: () => setTouched((current) => ({ ...current, [name]: true })),
-    error: errorFor(name),
-  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -163,15 +139,7 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
             autoComplete="new-password"
             {...field("confirmPassword")}
           />
-          <CheckboxField
-            id="termsAccepted"
-            checked={values.termsAccepted}
-            onCheckedChange={(checked) => {
-              setValues((current) => ({ ...current, termsAccepted: checked }));
-              setTouched((current) => ({ ...current, termsAccepted: true }));
-            }}
-            error={errorFor("termsAccepted")}
-          >
+          <CheckboxField id="termsAccepted" {...checkbox("termsAccepted")}>
             <span>
               Приемам{" "}
               <Link href="/obshti-usloviya" className={inlineLink}>
@@ -184,24 +152,18 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
               .
             </span>
           </CheckboxField>
-          <CheckboxField
-            id="marketingOptIn"
-            checked={values.marketingOptIn}
-            onCheckedChange={(checked) =>
-              setValues((current) => ({ ...current, marketingOptIn: checked }))
-            }
-          >
+          <CheckboxField id="marketingOptIn" {...checkbox("marketingOptIn")}>
             Искам да получавам безплатни прогнози, оферти и новини по имейл.
           </CheckboxField>
         </CardContent>
         <CardFooter className="mt-6 flex flex-col gap-4">
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={!isValid || pending}
+          <SubmitButton
+            disabled={!isValid}
+            pending={pending}
+            pendingLabel="Регистриране…"
           >
-            {pending ? "Регистриране…" : "Регистрирай се"}
-          </Button>
+            Регистрирай се
+          </SubmitButton>
           <p className="text-muted-foreground text-sm">
             Вече имаш профил?{" "}
             <Link href="/login" className={inlineLink}>

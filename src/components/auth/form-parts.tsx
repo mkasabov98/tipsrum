@@ -1,6 +1,36 @@
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * The button's default disabled style is 50% opacity, which on the near-black
+ * card makes it vanish. A muted fill with a border keeps it clearly visible as
+ * a button that simply isn't ready yet.
+ */
+export function SubmitButton({
+  disabled,
+  pending,
+  pendingLabel,
+  children,
+}: {
+  disabled: boolean;
+  pending: boolean;
+  pendingLabel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      type="submit"
+      className="w-full disabled:border-white/25 disabled:bg-white/15 disabled:text-white/70 disabled:opacity-100"
+      disabled={disabled || pending}
+    >
+      {pending ? pendingLabel : children}
+    </Button>
+  );
+}
 
 type CheckboxFieldProps = {
   id: string;

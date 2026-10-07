@@ -3,8 +3,12 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { FormAlert, TextField } from "@/components/auth/form-parts";
-import { Button } from "@/components/ui/button";
+import {
+  FormAlert,
+  SubmitButton,
+  TextField,
+} from "@/components/auth/form-parts";
+import { type FieldErrors, useAuthForm } from "@/components/auth/use-auth-form";
 import {
   Card,
   CardContent,
@@ -19,32 +23,49 @@ import { passwordProblem } from "@/lib/password";
 
 const inlineLink = "text-sm text-primary underline-offset-4 hover:underline";
 
+type Values = { password: string; confirmPassword: string };
+
+const EMPTY: Values = { password: "", confirmPassword: "" };
+
+function validate(values: Values): FieldErrors<Values> {
+  const errors: FieldErrors<Values> = {};
+
+  if (!values.password) {
+    errors.password = "Въведи парола.";
+  } else {
+    const problem = passwordProblem(values.password);
+    if (problem) errors.password = authErrorMessage({ code: problem });
+  }
+
+  if (!values.confirmPassword) {
+    errors.confirmPassword = "Потвърди паролата.";
+  } else if (values.confirmPassword !== values.password) {
+    errors.confirmPassword = "Паролите не съвпадат.";
+  }
+
+  return errors;
+}
+
 export function ResetPasswordForm({ token }: { token: string | null }) {
+  const { values, isValid, field } = useAuthForm(EMPTY, validate);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!token) return;
-    const form = new FormData(event.currentTarget);
-    const newPassword = String(form.get("password"));
+    if (!token || !isValid || pending) return;
 
-    const problem = passwordProblem(newPassword);
-    if (problem) {
-      return setError(authErrorMessage({ code: problem }));
-    }
-    if (newPassword !== form.get("confirmPassword")) {
-      return setError("Паролите не съвпадат.");
-    }
-
-    setError(null);
+    setServerError(null);
     setPending(true);
-    const { error } = await authClient.resetPassword({ newPassword, token });
+    const { error } = await authClient.resetPassword({
+      newPassword: values.password,
+      token,
+    });
     setPending(false);
 
     if (error) {
-      setError(authErrorMessage(error));
+      setServerError(authErrorMessage(error));
       return;
     }
     setDone(true);
@@ -91,31 +112,33 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
           </CardFooter>
         </>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
           <CardContent className="grid gap-4">
-            {error && <FormAlert>{error}</FormAlert>}
+            {serverError && <FormAlert>{serverError}</FormAlert>}
             <TextField
               id="password"
               label="Нова парола"
               type="password"
               autoComplete="new-password"
               hint="Поне 8 символа, с главна и малка буква, цифра и символ."
-              required
-              minLength={8}
+              {...field("password")}
             />
             <TextField
               id="confirmPassword"
               label="Потвърди паролата"
               type="password"
               autoComplete="new-password"
-              required
-              minLength={8}
+              {...field("confirmPassword")}
             />
           </CardContent>
           <CardFooter className="mt-6">
-            <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? "Запазване…" : "Запази паролата"}
-            </Button>
+            <SubmitButton
+              disabled={!isValid}
+              pending={pending}
+              pendingLabel="Запазване…"
+            >
+              Запази паролата
+            </SubmitButton>
           </CardFooter>
         </form>
       )}
