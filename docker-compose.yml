@@ -10,11 +10,11 @@ services:
       POSTGRES_PASSWORD: tipsrum
       POSTGRES_DB: tipsrum
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - tipsrum-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U tipsrum -d tipsrum']
+      test: ["CMD-SHELL", "pg_isready -U tipsrum -d tipsrum"]
       interval: 5s
       timeout: 5s
       retries: 5

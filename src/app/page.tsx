@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-      <p className="text-sm font-semibold tracking-widest text-primary uppercase">
+      <p className="text-primary text-sm font-semibold tracking-widest uppercase">
         Tipsrum
       </p>
       <h1 className="max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
