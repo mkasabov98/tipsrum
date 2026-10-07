@@ -2,23 +2,18 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
-import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail } from "@/lib/email";
-import { isValidUsername } from "@/lib/username";
+import { PASSWORD_MIN_LENGTH, passwordProblem } from "@/lib/password";
 
 const THIRTY_DAYS = 60 * 60 * 24 * 30;
 const ONE_DAY = 60 * 60 * 24;
 
-async function isUsernameTaken(username: string): Promise<boolean> {
-  const rows = await db
-    .select({ id: schema.user.id })
-    .from(schema.user)
-    .where(sql`lower(${schema.user.username}) = lower(${username})`)
-    .limit(1);
-  return rows.length > 0;
+/** "martin@example.com" -> "martin". Only ever a display label. */
+function displayNameFromEmail(email: string): string {
+  return email.trim().split("@")[0] || email.trim();
 }
 
 export const auth = betterAuth({
@@ -65,10 +60,6 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      username: {
-        type: "string",
-        required: true,
-      },
       // input: false is load-bearing - it stops a client from setting its own
       // entitlement at registration. Premium is granted only by the Phase 5
       // billing webhooks.
@@ -96,8 +87,6 @@ export const auth = betterAuth({
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path === "/sign-up/email") {
         const body = ctx.body as Record<string, unknown>;
-        const username =
-          typeof body.username === "string" ? body.username.trim() : "";
 
         if (body.termsAccepted !== true) {
           throw new APIError("BAD_REQUEST", {
@@ -105,29 +94,27 @@ export const auth = betterAuth({
             message: "Terms and privacy policy must be accepted",
           });
         }
-        if (!isValidUsername(username)) {
-          throw new APIError("BAD_REQUEST", {
-            code: "INVALID_USERNAME",
-            message: "Username is invalid",
-          });
-        }
-        // Friendly error for the common case; the lower(username) unique index is
-        // still the real guarantee against two simultaneous signups.
-        if (await isUsernameTaken(username)) {
-          throw new APIError("BAD_REQUEST", {
-            code: "USERNAME_TAKEN",
-            message: "Username is already taken",
-          });
-        }
       }
 
-      // The spec has no username change, and allowing it here would bypass the
-      // validation above.
-      if (ctx.path === "/update-user" && ctx.body && "username" in ctx.body) {
-        throw new APIError("BAD_REQUEST", {
-          code: "USERNAME_CHANGE_NOT_ALLOWED",
-          message: "Username cannot be changed",
-        });
+      // Every route that sets a password goes through the same rules, so the
+      // API cannot be used to set something weaker than the form allows.
+      const PASSWORD_FIELD_BY_PATH: Record<string, string> = {
+        "/sign-up/email": "password",
+        "/reset-password": "newPassword",
+        "/change-password": "newPassword",
+      };
+      const passwordField = PASSWORD_FIELD_BY_PATH[ctx.path];
+      if (passwordField && ctx.body) {
+        const value = (ctx.body as Record<string, unknown>)[passwordField];
+        if (typeof value === "string") {
+          const problem = passwordProblem(value);
+          if (problem) {
+            throw new APIError("BAD_REQUEST", {
+              code: problem,
+              message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters and contain an upper-case letter, a lower-case letter, a digit and a symbol`,
+            });
+          }
+        }
       }
     }),
   },
@@ -136,13 +123,12 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          const username = (user as { username?: string }).username?.trim();
           return {
             data: {
               ...user,
-              username,
-              // The spec never asks for a display name; Better-Auth requires one.
-              name: username ?? user.name,
+              // Ignore whatever name the client sent: it is only a label, and
+              // deriving it here keeps it consistent with the email.
+              name: displayNameFromEmail(user.email),
               termsAcceptedAt: new Date(),
             },
           };

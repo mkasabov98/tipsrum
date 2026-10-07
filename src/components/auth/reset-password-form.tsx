@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage } from "@/lib/auth-errors";
+import { passwordProblem } from "@/lib/password";
 
 const inlineLink = "text-sm text-primary underline-offset-4 hover:underline";
 
@@ -29,8 +30,9 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
     const form = new FormData(event.currentTarget);
     const newPassword = String(form.get("password"));
 
-    if (newPassword.length < 8) {
-      return setError(authErrorMessage({ code: "PASSWORD_TOO_SHORT" }));
+    const problem = passwordProblem(newPassword);
+    if (problem) {
+      return setError(authErrorMessage({ code: problem }));
     }
     if (newPassword !== form.get("confirmPassword")) {
       return setError("Паролите не съвпадат.");
@@ -97,7 +99,7 @@ export function ResetPasswordForm({ token }: { token: string | null }) {
               label="Нова парола"
               type="password"
               autoComplete="new-password"
-              hint="Поне 8 символа."
+              hint="Поне 8 символа, с главна и малка буква, цифра и символ."
               required
               minLength={8}
             />

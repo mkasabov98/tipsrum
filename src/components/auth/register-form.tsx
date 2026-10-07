@@ -20,14 +20,13 @@ import {
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { authErrorMessage } from "@/lib/auth-errors";
-import { isValidUsername } from "@/lib/username";
+import { passwordProblem } from "@/lib/password";
 
 const inlineLink = "text-primary underline-offset-4 hover:underline";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type Values = {
-  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -39,7 +38,6 @@ type Values = {
 type Errors = Partial<Record<keyof Values, string>>;
 
 const EMPTY: Values = {
-  username: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -51,12 +49,6 @@ const EMPTY: Values = {
 function validate(values: Values): Errors {
   const errors: Errors = {};
 
-  if (!values.username.trim()) {
-    errors.username = "Въведи потребителско име.";
-  } else if (!isValidUsername(values.username.trim())) {
-    errors.username = authErrorMessage({ code: "INVALID_USERNAME" });
-  }
-
   if (!values.email.trim()) {
     errors.email = "Въведи имейл.";
   } else if (!EMAIL_PATTERN.test(values.email.trim())) {
@@ -65,8 +57,9 @@ function validate(values: Values): Errors {
 
   if (!values.password) {
     errors.password = "Въведи парола.";
-  } else if (values.password.length < 8) {
-    errors.password = authErrorMessage({ code: "PASSWORD_TOO_SHORT" });
+  } else {
+    const problem = passwordProblem(values.password);
+    if (problem) errors.password = authErrorMessage({ code: problem });
   }
 
   if (!values.confirmPassword) {
@@ -116,10 +109,12 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
     setServerError(null);
     setPending(true);
 
+    const email = values.email.trim();
     const { error } = await authClient.signUp.email({
-      name: values.username.trim(),
-      username: values.username.trim(),
-      email: values.email.trim(),
+      // Required by Better-Auth, but the server derives the stored name from
+      // the email itself, so this value is never trusted.
+      name: email,
+      email,
       password: values.password,
       marketingOptIn: values.marketingOptIn,
       // Not stored as-is: the server checks it and stamps termsAcceptedAt itself.
@@ -147,13 +142,6 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
         <CardContent className="grid gap-4">
           {serverError && <FormAlert>{serverError}</FormAlert>}
           <TextField
-            id="username"
-            label="Потребителско име"
-            autoComplete="username"
-            hint="3–30 символа: латински букви, цифри, точка, долна черта или тире."
-            {...field("username")}
-          />
-          <TextField
             id="email"
             label="Имейл"
             type="email"
@@ -165,7 +153,7 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
             label="Парола"
             type="password"
             autoComplete="new-password"
-            hint="Поне 8 символа."
+            hint="Поне 8 символа, с главна и малка буква, цифра и символ."
             {...field("password")}
           />
           <TextField

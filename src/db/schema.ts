@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import {
   boolean,
   date,
@@ -41,29 +40,23 @@ export const inviteStatusEnum = pgEnum("invite_status", [
 /* `user` and mirrored in the additionalFields config in src/lib/auth.ts.      */
 /* -------------------------------------------------------------------------- */
 
-export const user = pgTable(
-  "user",
-  {
-    id: text("id").primaryKey(),
-    name: text("name").notNull(),
-    email: text("email").notNull().unique(),
-    emailVerified: boolean("email_verified").notNull().default(false),
-    image: text("image"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+// Email is the only identifier for a user; Better-Auth lowercases it on sign-up.
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  // Required by Better-Auth. Derived from the email's local part at sign-up,
+  // since the form no longer asks for a name.
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 
-    // Custom fields (Phase 1 of the build plan).
-    username: text("username"),
-    // Never written from registration input - only by billing webhooks (Phase 5).
-    entitlement: text("entitlement").notNull().default("free"),
-    termsAcceptedAt: timestamp("terms_accepted_at"),
-    marketingOptIn: boolean("marketing_opt_in").notNull().default(false),
-  },
-  (t) => [
-    // Case-insensitive, matching WordPress: "Martin" and "martin" are the same user.
-    uniqueIndex("user_username_lower_idx").on(sql`lower(${t.username})`),
-  ],
-);
+  // Never written from registration input - only by billing webhooks (Phase 5).
+  entitlement: text("entitlement").notNull().default("free"),
+  termsAcceptedAt: timestamp("terms_accepted_at"),
+  marketingOptIn: boolean("marketing_opt_in").notNull().default(false),
+});
 
 export const session = pgTable(
   "session",

@@ -29,7 +29,6 @@ export default async function MyAccountPage() {
 
   const { user } = session;
   const rows = [
-    { label: "Потребителско име", value: user.username },
     { label: "Имейл", value: user.email },
     {
       label: "План",
@@ -42,7 +41,7 @@ export default async function MyAccountPage() {
       <Card className="h-fit w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-xl">Моят профил</CardTitle>
-          <CardDescription>Здравей, {user.username}!</CardDescription>
+          <CardDescription>Здравей, {user.name}!</CardDescription>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-3 text-sm">
