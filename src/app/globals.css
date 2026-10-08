@@ -135,3 +135,59 @@ input::-ms-reveal,
 input::-ms-clear {
   display: none;
 }
+
+/* Ported page copy (see src/content). Hand-rolled rather than pulling in the
+   typography plugin for a handful of static pages. */
+.prose {
+  color: var(--foreground);
+  line-height: 1.7;
+}
+.prose > * + * {
+  margin-top: 1rem;
+}
+.prose h2 {
+  margin-top: 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.prose h3 {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.prose h4 {
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
+.prose p,
+.prose li {
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 0.5rem;
+}
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.prose blockquote {
+  border-left: 2px solid var(--primary);
+  padding-left: 1rem;
+  font-style: italic;
+}
