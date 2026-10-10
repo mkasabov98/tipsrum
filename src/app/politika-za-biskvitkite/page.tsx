@@ -12,7 +12,14 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <PageShell title={TITLE}>
+    <PageShell
+      title={TITLE}
+      eyebrow="Бисквитки"
+      crumbs={[
+        { href: "/", label: "Начало" },
+        { href: "/politika-za-biskvitkite", label: TITLE },
+      ]}
+    >
       <Prose html={getPageContent("politika-za-biskvitkite")} />
     </PageShell>
   );

@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center">
       <Image
-        src="/logo-light.png"
+        src="/logo.png"
         alt={SITE_NAME}
         width={1164}
         height={234}

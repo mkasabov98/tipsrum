@@ -16,6 +16,11 @@ export default function ContactPage() {
   return (
     <PageShell
       title="Свържете се с нас"
+      eyebrow="Контакти"
+      crumbs={[
+        { href: "/", label: "Начало" },
+        { href: "/kontakti", label: "Контакти" },
+      ]}
       lead="Имате въпроси или искате повече информация за нашите прогнози? Пишете ни по предпочитания от вас канал."
     >
       <div className="grid gap-10 sm:grid-cols-2">

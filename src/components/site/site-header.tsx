@@ -7,14 +7,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { MAIN_NAV, SITE_NAME, type NavItem } from "@/lib/site";
+import { MAIN_NAV, SITE_NAME } from "@/lib/site";
 import { cn } from "@/lib/utils";
-
-function isActive(pathname: string, item: NavItem) {
-  if (item.href === "/") return pathname === "/";
-  if (pathname === item.href) return true;
-  return item.children?.some((child) => child.href === pathname) ?? false;
-}
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -23,18 +17,19 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
+
   return (
-    <header className="border-border/60 bg-background/95 sticky top-0 z-50 border-b backdrop-blur">
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:h-16">
+    <header className="bg-card border-border sticky top-0 z-50 border-b">
+      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
           className="shrink-0"
           aria-label={`${SITE_NAME} — начало`}
         >
-          {/* Light variant: the original olive sits at about 2.4:1 on the near-black
-              background, which is too faint for a logo. */}
           <Image
-            src="/logo-light.png"
+            src="/logo.png"
             alt={SITE_NAME}
             width={1164}
             height={234}
@@ -43,41 +38,22 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Desktop navigation */}
         <nav aria-label="Основна навигация" className="hidden md:block">
           <ul className="flex items-center gap-1">
             {MAIN_NAV.map((item) => (
-              <li key={item.href} className="group relative">
+              <li key={item.href}>
                 <Link
                   href={item.href}
-                  aria-current={isActive(pathname, item) ? "page" : undefined}
+                  aria-current={isActive(item.href) ? "page" : undefined}
                   className={cn(
-                    "hover:text-foreground rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    isActive(pathname, item)
-                      ? "text-foreground"
+                    "hover:text-foreground rounded-md px-3 py-2 text-sm transition-colors",
+                    isActive(item.href)
+                      ? "text-foreground font-semibold"
                       : "text-muted-foreground",
                   )}
                 >
                   {item.label}
                 </Link>
-                {item.children && (
-                  // Opens on hover and on keyboard focus, so it works without JS.
-                  <ul className="border-border bg-card invisible absolute top-full left-0 min-w-40 rounded-lg border p-1 opacity-0 shadow-lg transition-all group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-                    {item.children.map((child) => (
-                      <li key={child.href}>
-                        <Link
-                          href={child.href}
-                          aria-current={
-                            pathname === child.href ? "page" : undefined
-                          }
-                          className="hover:bg-muted text-muted-foreground hover:text-foreground block rounded-md px-3 py-2 text-sm"
-                        >
-                          {child.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
               </li>
             ))}
           </ul>
@@ -85,13 +61,22 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/my_account"
+            href="/login"
             className={cn(
-              buttonVariants({ size: "sm" }),
-              "hidden sm:inline-flex",
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "hidden h-9 px-4 sm:inline-flex",
             )}
           >
-            Акаунт
+            Вход
+          </Link>
+          <Link
+            href="/register"
+            className={cn(
+              buttonVariants({ size: "sm" }),
+              "hidden h-9 px-4 sm:inline-flex",
+            )}
+          >
+            Започни безплатно
           </Link>
           <button
             type="button"
@@ -110,40 +95,44 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {/* Mobile navigation: a flat list, so the Планове children stay reachable. */}
       {open && (
         <nav
           id="mobile-nav"
           aria-label="Мобилна навигация"
-          className="border-border/60 border-t md:hidden"
+          className="border-border border-t md:hidden"
         >
           <ul className="mx-auto grid max-w-6xl gap-1 px-4 py-3">
-            {MAIN_NAV.flatMap((item) => [item, ...(item.children ?? [])]).map(
-              (item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    onClick={close}
-                    aria-current={pathname === item.href ? "page" : undefined}
-                    className={cn(
-                      "block rounded-md px-3 py-3 text-sm font-medium",
-                      pathname === item.href
-                        ? "bg-muted text-foreground"
-                        : "text-muted-foreground",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ),
-            )}
-            <li>
+            {MAIN_NAV.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={close}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                  className={cn(
+                    "block rounded-md px-3 py-3 text-sm",
+                    isActive(item.href)
+                      ? "bg-muted text-foreground font-semibold"
+                      : "text-muted-foreground",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li className="mt-2 grid gap-2">
               <Link
-                href="/my_account"
+                href="/login"
                 onClick={close}
-                className="text-primary block rounded-md px-3 py-3 text-sm font-semibold"
+                className={cn(buttonVariants({ variant: "outline" }), "h-10")}
               >
-                Акаунт
+                Вход
+              </Link>
+              <Link
+                href="/register"
+                onClick={close}
+                className={cn(buttonVariants(), "h-10")}
+              >
+                Започни безплатно
               </Link>
             </li>
           </ul>

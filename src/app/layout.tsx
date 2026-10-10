@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Geist_Mono } from "next/font/google";
 
+import { ResultsTicker } from "@/components/site/results-ticker";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 
@@ -30,9 +31,10 @@ export default function RootLayout({
   return (
     <html
       lang="bg"
-      className={`${montserrat.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${montserrat.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <ResultsTicker />
         <SiteHeader />
         {children}
         <SiteFooter />

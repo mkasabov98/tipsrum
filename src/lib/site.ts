@@ -27,17 +27,25 @@ export type NavItem = {
 
 export const MAIN_NAV: readonly NavItem[] = [
   { href: "/", label: "Начало" },
-  {
-    href: "/planove",
-    label: "Планове",
-    children: [
-      { href: "/free", label: "Безплатен" },
-      { href: "/premium", label: "Премиум" },
-    ],
-  },
+  { href: "/planove", label: "Планове" },
+  { href: "/rezultati", label: "Резултати" },
   { href: "/polezno", label: "Полезно" },
-  { href: "/za-nas", label: "За нас" },
   { href: "/kontakti", label: "Контакти" },
+];
+
+/** Footer column 1. The design groups the plan pages together. */
+export const PLAN_NAV: readonly NavItem[] = [
+  { href: "/free", label: "Безплатен" },
+  { href: "/premium", label: "Премиум" },
+  { href: "/rezultati", label: "Резултати" },
+];
+
+/** Footer column 2. `/za-nas` is deliberately absent - the design drops it
+ *  from both nav and footer, though the page itself still resolves. */
+export const COMPANY_NAV: readonly NavItem[] = [
+  { href: "/kontakti", label: "Контакти" },
+  { href: "/obshti-usloviya", label: "Общи условия" },
+  { href: "/gdpr", label: "GDPR" },
 ];
 
 export const LEGAL_NAV: readonly NavItem[] = [
@@ -52,12 +60,13 @@ export const LEGAL_NAV: readonly NavItem[] = [
  */
 export const FOOTER_ARTICLES: readonly NavItem[] = [
   { href: "/suveti-pri-zapochvane", label: "Съвети при започване" },
-  {
-    href: "/kak-da-izbegnete-limitirane",
-    label: "Как да избегнете лимитиране",
-  },
   { href: "/opredelqne-na-banka", label: "Определяне на банка" },
+  { href: "/politika-za-biskvitkite", label: "Бисквитки" },
 ];
+
+/** Short description under the footer logo, from the design. */
+export const FOOTER_TAGLINE =
+  "Доказани конни прогнози за българския пазар. Данни, прозрачност и доверие.";
 
 // Required on a gambling-adjacent site; shown in the footer of every page.
 export const RESPONSIBLE_GAMBLING =
