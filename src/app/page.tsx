@@ -6,11 +6,10 @@ import {
   ShieldCheckIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { PlanCards } from "@/components/home/plan-cards";
-import { Marquee } from "@/components/site/marquee";
+import { WinsGallery } from "@/components/home/wins-gallery";
 import { DarkSection, Eyebrow } from "@/components/site/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/db";
@@ -43,11 +42,6 @@ const VALUE_PROPS = [
     body: "Екипът ни е на разположение по всяко време за въпроси, свързани с прогнозите и абонамента.",
   },
 ];
-
-// All eleven screenshots from the live testimonials gallery, in its order.
-const WINS = Array.from({ length: 11 }, (_, i) =>
-  String(i + 1).padStart(2, "0"),
-);
 
 export default async function Home() {
   const [totals] = await db
@@ -256,44 +250,7 @@ export default async function Home() {
             Скрийншоти директно от Telegram групата и от реални фишове.
           </p>
         </div>
-        <Marquee durationSeconds={60} className="mt-8">
-          {WINS.map((n) => (
-            <Image
-              key={n}
-              src={`/screenshots/win-${n}.webp`}
-              alt={`Скрийншот с печалба ${Number(n)}`}
-              width={620}
-              height={1378}
-              className="border-border mr-4 h-[22rem] w-auto rounded-xl border object-cover sm:h-[30rem]"
-            />
-          ))}
-        </Marquee>
-      </section>
-
-      <section className="mx-auto w-full max-w-6xl px-4 pb-20">
-        <div className="bg-primary text-primary-foreground rounded-2xl px-6 py-12 text-center">
-          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            Готов ли си да залагаш по-умно?
-          </h2>
-          <p className="mx-auto mt-3 max-w-lg text-sm opacity-90">
-            Присъедини се към безплатната група днес и виж какво означава
-            прогноза, водена от данни.
-          </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/register"
-              className="bg-card text-foreground hover:bg-card/90 inline-flex h-10 items-center rounded-lg px-5 text-sm font-medium transition-colors"
-            >
-              Започни безплатно
-            </Link>
-            <Link
-              href="/kontakti"
-              className="hover:bg-primary-foreground/10 inline-flex h-10 items-center rounded-lg border border-current/40 px-5 text-sm font-medium transition-colors"
-            >
-              Свържи се с нас
-            </Link>
-          </div>
-        </div>
+        <WinsGallery />
       </section>
     </main>
   );
