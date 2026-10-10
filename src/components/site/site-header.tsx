@@ -1,6 +1,7 @@
 "use client";
 
 import { MenuIcon, XIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -27,9 +28,19 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:h-16">
         <Link
           href="/"
-          className="text-primary text-base font-extrabold tracking-widest uppercase"
+          className="shrink-0"
+          aria-label={`${SITE_NAME} — начало`}
         >
-          {SITE_NAME}
+          {/* Light variant: the original olive sits at about 2.4:1 on the near-black
+              background, which is too faint for a logo. */}
+          <Image
+            src="/logo-light.png"
+            alt={SITE_NAME}
+            width={579}
+            height={118}
+            priority
+            className="h-6 w-auto sm:h-7"
+          />
         </Link>
 
         {/* Desktop navigation */}

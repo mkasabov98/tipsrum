@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -32,9 +33,13 @@ export function SiteFooter() {
     <footer className="border-border/60 mt-16 border-t">
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div className="grid gap-3">
-          <p className="text-primary text-sm font-extrabold tracking-widest uppercase">
-            {SITE_NAME}
-          </p>
+          <Image
+            src="/logo-light.png"
+            alt={SITE_NAME}
+            width={579}
+            height={118}
+            className="h-6 w-auto"
+          />
           <a href={`mailto:${CONTACT.email}`} className={linkClass}>
             {CONTACT.email}
           </a>
