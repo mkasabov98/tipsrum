@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { PlanCards } from "@/components/home/plan-cards";
+import { Marquee } from "@/components/site/marquee";
 import { DarkSection, Eyebrow } from "@/components/site/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/db";
@@ -43,7 +44,10 @@ const VALUE_PROPS = [
   },
 ];
 
-const WINS = [1, 2, 3, 4, 5, 6, 7];
+// All eleven screenshots from the live testimonials gallery, in its order.
+const WINS = Array.from({ length: 11 }, (_, i) =>
+  String(i + 1).padStart(2, "0"),
+);
 
 export default async function Home() {
   const [totals] = await db
@@ -240,27 +244,30 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:pb-20">
-        <Eyebrow>Реални резултати</Eyebrow>
-        <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Без монтаж. Ето печалбите.
-        </h2>
-        <p className="text-muted-foreground mt-4 max-w-2xl">
-          Скрийншоти директно от Telegram групата и от реални фишове.
-        </p>
-        <ul className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4">
+      {/* Full-bleed: the heading keeps the page gutter, the gallery runs edge
+          to edge so screenshots travel off both sides of the viewport. */}
+      <section className="pb-16 sm:pb-20">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <Eyebrow>Реални резултати</Eyebrow>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Без монтаж. Ето печалбите.
+          </h2>
+          <p className="text-muted-foreground mt-4 max-w-2xl">
+            Скрийншоти директно от Telegram групата и от реални фишове.
+          </p>
+        </div>
+        <Marquee durationSeconds={60} className="mt-8">
           {WINS.map((n) => (
-            <li key={n} className="snap-start">
-              <Image
-                src={`/screenshots/win-${n}.webp`}
-                alt={`Скрийншот с печалба ${n}`}
-                width={440}
-                height={978}
-                className="border-border h-80 w-auto rounded-xl border object-cover"
-              />
-            </li>
+            <Image
+              key={n}
+              src={`/screenshots/win-${n}.webp`}
+              alt={`Скрийншот с печалба ${Number(n)}`}
+              width={620}
+              height={1378}
+              className="border-border mr-4 h-[22rem] w-auto rounded-xl border object-cover sm:h-[30rem]"
+            />
           ))}
-        </ul>
+        </Marquee>
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 pb-20">

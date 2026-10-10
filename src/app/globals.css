@@ -208,3 +208,28 @@ input::-ms-clear {
   padding-left: 1rem;
   font-style: italic;
 }
+
+/* Edge-to-edge marquees (results ticker, wins gallery). The track holds the
+   content twice and slides exactly half its width, so the loop is seamless. */
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+  /* Still reachable: without motion the row becomes a normal scroller. */
+  .marquee {
+    overflow-x: auto;
+  }
+}
