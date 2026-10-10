@@ -8,8 +8,8 @@ export default function Home() {
       <Image
         src="/logo-light.png"
         alt={SITE_NAME}
-        width={579}
-        height={118}
+        width={1164}
+        height={234}
         priority
         className="h-10 w-auto sm:h-12"
       />

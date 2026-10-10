@@ -36,8 +36,8 @@ export function SiteFooter() {
           <Image
             src="/logo-light.png"
             alt={SITE_NAME}
-            width={579}
-            height={118}
+            width={1164}
+            height={234}
             className="h-6 w-auto"
           />
           <a href={`mailto:${CONTACT.email}`} className={linkClass}>
