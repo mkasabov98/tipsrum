@@ -11,7 +11,7 @@ export default function AuthLayout({
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">
       {/* The wordmark now lives in the site header, which wraps every page. */}
-      <div className="grid w-full max-w-sm gap-6">{children}</div>
+      <div className="grid w-full max-w-md gap-6">{children}</div>
     </main>
   );
 }
