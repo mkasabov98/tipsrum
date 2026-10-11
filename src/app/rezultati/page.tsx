@@ -4,6 +4,7 @@ import { desc, sql } from "drizzle-orm";
 import { PageShell } from "@/components/site/page-shell";
 import { db } from "@/db";
 import { bets } from "@/db/schema";
+import { formatEurSigned, formatMonth, formatPercent } from "@/lib/format";
 
 const TITLE = "Резултати";
 
@@ -71,18 +72,17 @@ export default async function ResultsPage() {
                 key={`${row.month}-${row.plan}`}
                 className="border-border border-b last:border-0"
               >
-                <td className="px-4 py-3 font-mono">{row.month}</td>
+                <td className="px-4 py-3">{formatMonth(row.month)}</td>
                 <td className="px-4 py-3">
                   {row.plan === "premium" ? "Премиум" : "Безплатен"}
                 </td>
                 <td
                   className={`px-4 py-3 text-right font-mono ${Number(row.roi) >= 0 ? "text-win" : "text-loss"}`}
                 >
-                  {Number(row.roi) >= 0 ? "+" : ""}
-                  {row.roi}%
+                  {formatPercent(Number(row.roi))}
                 </td>
                 <td className="px-4 py-3 text-right font-mono">
-                  €{row.profit}
+                  {formatEurSigned(row.profit, { decimals: 2 })}
                 </td>
               </tr>
             ))}

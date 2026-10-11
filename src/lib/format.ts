@@ -36,3 +36,25 @@ export function formatPercent(value: number | string): string {
   if (!Number.isFinite(n)) return "—";
   return `${n > 0 ? "+" : ""}${Math.round(n)}%`;
 }
+
+/** Long Bulgarian date for article bylines: "18 януари 2025 г." */
+export function formatDate(value: Date | string | null): string {
+  if (!value) return "";
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("bg-BG", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+/** "2026-05" to "май 2026", for the month-by-month results. */
+export function formatMonth(month: string): string {
+  const [year, index] = month.split("-").map(Number);
+  if (!year || !index) return month;
+  const label = new Intl.DateTimeFormat("bg-BG", { month: "long" }).format(
+    new Date(Date.UTC(year, index - 1, 1)),
+  );
+  return `${label} ${year}`;
+}
