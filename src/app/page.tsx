@@ -81,13 +81,13 @@ export default async function Home() {
           gradient until a licensed racing photo exists. */}
       <section className="dark bg-background text-foreground relative overflow-hidden">
         <Image
-          src="/hero-horses.webp"
+          src="/hero-race.webp"
           alt=""
           aria-hidden
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[50%_40%]"
+          className="object-cover object-center"
         />
         {/* Scrim: the photo is bright, so the copy needs a dark wash under it
             to stay readable. Heavier on the left, where the text sits. */}
@@ -99,7 +99,7 @@ export default async function Home() {
           aria-hidden
           className="from-background/90 absolute inset-0 bg-gradient-to-t via-transparent to-transparent"
         />
-        <div className="relative mx-auto w-full max-w-6xl px-4 py-20 sm:py-28">
+        <div className="relative mx-auto w-full max-w-6xl px-4 py-14 sm:py-20">
           <Eyebrow>Прозрачни · Проследими · Доказани</Eyebrow>
           <h1 className="mt-5 max-w-3xl text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
             Конни прогнози, водени от{" "}
