@@ -62,7 +62,7 @@ export const LEGAL_NAV: readonly NavItem[] = [
 export const FOOTER_ARTICLES: readonly NavItem[] = [
   { href: "/suveti-pri-zapochvane", label: "Съвети при започване" },
   { href: "/opredelqne-na-banka", label: "Определяне на банка" },
-  { href: "/politika-za-biskvitkite", label: "Бисквитки" },
+  { href: "/polezno", label: "Всички статии" },
 ];
 
 /** Short description under the footer logo, from the design. */

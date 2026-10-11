@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { PostCard } from "@/components/blog/post-card";
 import { PlanCards } from "@/components/home/plan-cards";
 import { WinsGallery } from "@/components/home/wins-gallery";
 import { DarkSection, Eyebrow } from "@/components/site/page-shell";
@@ -16,6 +17,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/db";
 import { bets } from "@/db/schema";
 import { formatEur, formatEurSigned, formatPercent } from "@/lib/format";
+import { listPosts } from "@/lib/posts";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -64,6 +66,8 @@ export default async function Home() {
     .orderBy(desc(bets.month))
     .limit(6);
 
+  const posts = await listPosts(3);
+
   const stats = [
     { value: formatEur(totals.profit), label: "Обща проследена печалба" },
     { value: String(totals.months), label: "Проследени месеца" },
@@ -76,9 +80,8 @@ export default async function Home() {
 
   return (
     <main className="flex-1">
-      {/* Hero. The design puts a racing photo behind this; nothing on the live
-          site fits (show jumping and a casino table), so it runs on the
-          gradient until a licensed racing photo exists. */}
+      {/* Hero. Racing photo behind the copy, cropped to the region the owner
+          marked on the original, with a scrim so the text stays readable. */}
       <section className="dark bg-background text-foreground relative overflow-hidden">
         <Image
           src="/hero-race.webp"
@@ -268,6 +271,32 @@ export default async function Home() {
         </div>
         <WinsGallery />
       </section>
+
+      {posts.length > 0 && (
+        <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:pb-20">
+          <Eyebrow>Полезно</Eyebrow>
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Преди да заложиш, прочети това.
+          </h2>
+          <p className="text-muted-foreground mt-4 max-w-2xl">
+            Стратегия, банка и как да не те лимитират — от хора, които залагат
+            същите прогнози.
+          </p>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {posts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+          <p className="mt-8">
+            <Link
+              href="/polezno"
+              className="text-primary text-sm font-medium underline-offset-4 hover:underline"
+            >
+              Всички статии →
+            </Link>
+          </p>
+        </section>
+      )}
     </main>
   );
 }
