@@ -21,7 +21,10 @@ function Cell({ value }: { value: string | boolean }) {
   if (value === true)
     return (
       <>
-        <CheckIcon className="text-primary mx-auto size-4" aria-hidden />
+        <CheckIcon
+          className="text-primary dark:text-mint mx-auto size-4"
+          aria-hidden
+        />
         <span className="sr-only">включено</span>
       </>
     );
@@ -54,7 +57,7 @@ export function ComparisonTable() {
             </th>
             <th
               scope="col"
-              className="bg-accent/40 px-5 py-3 text-center font-normal"
+              className="bg-accent/40 text-foreground dark:bg-accent/12 px-5 py-3 text-center font-medium"
             >
               Премиум
             </th>
@@ -72,7 +75,7 @@ export function ComparisonTable() {
               <td className="px-5 py-3 text-center">
                 <Cell value={row.free} />
               </td>
-              <td className="bg-accent/40 px-5 py-3 text-center font-medium">
+              <td className="bg-accent/40 dark:bg-accent/12 px-5 py-3 text-center font-medium">
                 <Cell value={row.premium} />
               </td>
             </tr>

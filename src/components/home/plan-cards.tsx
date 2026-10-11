@@ -11,6 +11,9 @@ export type Plan = {
   roiLine: string;
   features: readonly string[];
   cta: { href: string; label: string };
+  /** Quiet link to the plan page, so both cards offer the same two routes:
+   *  act now, or read the detail first. */
+  detail: { href: string; label: string };
   recommended?: boolean;
 };
 
@@ -27,6 +30,7 @@ export const PLANS: readonly Plan[] = [
       "Нулев риск · без банкови данни",
     ],
     cta: { href: "/register", label: "Влез безплатно" },
+    detail: { href: "/free", label: "Повече за плана" },
   },
   {
     name: "Премиум",
@@ -39,7 +43,10 @@ export const PLANS: readonly Plan[] = [
       "Очаквана месечна печалба ~€420",
       "30-дневна гаранция на парите",
     ],
-    cta: { href: "/premium", label: "Стани Премиум" },
+    // Checkout arrives in Phase 6; until then the Premium funnel also starts
+    // with an account, exactly as the button on /premium does.
+    cta: { href: "/register", label: "Стани Премиум" },
+    detail: { href: "/premium", label: "Повече за плана" },
     recommended: true,
   },
 ];
@@ -97,6 +104,12 @@ export function PlanCards({ plans = PLANS }: { plans?: readonly Plan[] }) {
             )}
           >
             {plan.cta.label}
+          </Link>
+          <Link
+            href={plan.detail.href}
+            className="text-muted-foreground hover:text-foreground mt-3 block text-center text-xs underline-offset-4 hover:underline"
+          >
+            {plan.detail.label} →
           </Link>
         </div>
       ))}
