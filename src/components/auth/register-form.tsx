@@ -112,7 +112,7 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
       <CardHeader>
         <CardTitle className="text-xl">Регистрация</CardTitle>
         <CardDescription>
-          Безплатно е и отнема по-малко от 30 секунди.
+          Безплатна е и отнема по-малко от 30 секунди.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit} noValidate>

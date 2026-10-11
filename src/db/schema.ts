@@ -226,7 +226,11 @@ export const posts = pgTable(
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     excerpt: text("excerpt"),
-    // Markdown, edited through the owner-only admin.
+    // Short label shown on the cards and above the article title.
+    category: text("category"),
+    // Sanitised HTML. Phase 3 seeds it from src/content; Phase 9 adds the
+    // owner-only editor that writes it. Never user input, so it is safe to
+    // render with dangerouslySetInnerHTML.
     content: text("content").notNull(),
     coverImage: text("cover_image"),
     publishedAt: timestamp("published_at"),

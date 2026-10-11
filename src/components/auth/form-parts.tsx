@@ -29,7 +29,9 @@ export function SubmitButton({
   return (
     <Button
       type="submit"
-      className="w-full disabled:border-white/25 disabled:bg-white/15 disabled:text-white/70 disabled:opacity-100"
+      // Token-based so the inactive state stays visible on the light ground and
+      // inside `.dark` sections; a fixed white tint disappeared on one of them.
+      className="disabled:border-border disabled:bg-secondary disabled:text-muted-foreground w-full disabled:opacity-100"
       disabled={disabled || pending}
     >
       {pending ? pendingLabel : children}

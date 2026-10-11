@@ -5,7 +5,6 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -41,7 +40,6 @@ export default async function MyAccountPage() {
       <Card className="h-fit w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-xl">Моят профил</CardTitle>
-          <CardDescription>Здравей, {user.name}!</CardDescription>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-3 text-sm">

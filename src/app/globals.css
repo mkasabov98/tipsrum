@@ -6,6 +6,10 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-brand-soft: var(--brand-soft);
+  --color-mint: var(--mint);
+  --color-win: var(--win);
+  --color-loss: var(--loss);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
@@ -49,73 +53,86 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Palette sampled from the Figma export. The site is light by default and
+     switches to the dark palette inside sections marked with `.dark`. */
+  --background: #f4f4f2;
+  --foreground: #1f261c;
+  --card: #ffffff;
+  --card-foreground: #1f261c;
+  --popover: #ffffff;
+  --popover-foreground: #1f261c;
+  --primary: #526942;
+  --primary-foreground: #ffffff;
+  --secondary: #ebeee7;
+  --secondary-foreground: #1f261c;
+  --muted: #ebeee7;
+  --muted-foreground: #72796a;
+  --accent: #e7ede0;
+  --accent-foreground: #2f3d24;
+  --destructive: #c13b2d;
+  --border: #e3e4df;
+  --input: #dfe1db;
+  --ring: #526942;
+  --chart-1: #526942;
+  --chart-2: #8ba876;
+  --chart-3: #badb93;
+  --chart-4: #72796a;
+  --chart-5: #2a3124;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1f261c;
+  --sidebar-primary: #526942;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ebeee7;
+  --sidebar-accent-foreground: #1f261c;
+  --sidebar-border: #e3e4df;
+  --sidebar-ring: #526942;
+
+  /* Brand extras the design uses beyond the shadcn token set. */
+  --brand-soft: #badb93;
+  --mint: #46cf83;
+  --win: #2f7d4f;
+  --loss: #c13b2d;
 }
 
 .dark {
-  /* Tipsrum brand: black-terminal background, olive accent (#536942) */
-  --background: #000000;
-  --foreground: #f2f2f0;
-  --card: #0d0d0c;
-  --card-foreground: #f2f2f0;
-  --popover: #0d0d0c;
-  --popover-foreground: #f2f2f0;
-  --primary: #536942;
-  --primary-foreground: #f2f2f0;
-  --secondary: #1a1a18;
-  --secondary-foreground: #f2f2f0;
-  --muted: #171715;
-  --muted-foreground: #9a9a94;
-  --accent: #536942;
-  --accent-foreground: #f2f2f0;
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: rgb(255 255 255 / 12%);
-  --input: rgb(255 255 255 / 15%);
-  --ring: #6d8a58;
-  --chart-1: #536942;
+  /* Dark bands: hero, results sections, CTA strips and the footer. */
+  --background: #1f261c;
+  --foreground: #f4f4f2;
+  --card: #2a3124;
+  --card-foreground: #f4f4f2;
+  --popover: #2a3124;
+  --popover-foreground: #f4f4f2;
+  --primary: #526942;
+  --primary-foreground: #ffffff;
+  --secondary: #313a2a;
+  --secondary-foreground: #f4f4f2;
+  --muted: #2a3124;
+  --muted-foreground: #a8b0a0;
+  --accent: #badb93;
+  --accent-foreground: #1f261c;
+  --destructive: #c9564a;
+  --border: rgb(255 255 255 / 10%);
+  --input: rgb(255 255 255 / 14%);
+  --ring: #badb93;
+  --chart-1: #badb93;
   --chart-2: #8ba876;
-  --chart-3: #c9c9c9;
-  --chart-4: #6d6d6d;
-  --chart-5: #3a3a3a;
-  --sidebar: #0d0d0c;
-  --sidebar-foreground: #f2f2f0;
-  --sidebar-primary: #536942;
-  --sidebar-primary-foreground: #f2f2f0;
-  --sidebar-accent: #1a1a18;
-  --sidebar-accent-foreground: #f2f2f0;
-  --sidebar-border: rgb(255 255 255 / 12%);
-  --sidebar-ring: #6d8a58;
+  --chart-3: #526942;
+  --chart-4: #a8b0a0;
+  --chart-5: #313a2a;
+  --sidebar: #2a3124;
+  --sidebar-foreground: #f4f4f2;
+  --sidebar-primary: #badb93;
+  --sidebar-primary-foreground: #1f261c;
+  --sidebar-accent: #313a2a;
+  --sidebar-accent-foreground: #f4f4f2;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-ring: #badb93;
+
+  --brand-soft: #badb93;
+  --mint: #46cf83;
+  --win: #7fc79a;
+  --loss: #e08b82;
 }
 
 @layer base {
@@ -134,4 +151,85 @@
 input::-ms-reveal,
 input::-ms-clear {
   display: none;
+}
+
+/* Ported page copy (see src/content). Hand-rolled rather than pulling in the
+   typography plugin for a handful of static pages. */
+.prose {
+  color: var(--foreground);
+  line-height: 1.7;
+}
+.prose > * + * {
+  margin-top: 1rem;
+}
+.prose h2 {
+  margin-top: 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.prose h3 {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.prose h4 {
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
+.prose p,
+.prose li {
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li + li {
+  margin-top: 0.5rem;
+}
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.prose strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+.prose blockquote {
+  border-left: 2px solid var(--primary);
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+/* Edge-to-edge marquees (results ticker, wins gallery). The track holds the
+   content twice and slides exactly half its width, so the loop is seamless. */
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-scroll var(--marquee-duration, 40s) linear infinite;
+  will-change: transform;
+}
+.marquee:hover .marquee-track,
+.marquee:has(:focus-visible) .marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+  /* Still reachable: without motion the row becomes a normal scroller. */
+  .marquee {
+    overflow-x: auto;
+  }
 }
