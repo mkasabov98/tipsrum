@@ -87,7 +87,7 @@ export default async function Home() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[60%_35%]"
+          className="object-cover object-[50%_80%]"
         />
         {/* Scrim: the photo is bright, so the copy needs a dark wash under it
             to stay readable. Heavier on the left, where the text sits. */}

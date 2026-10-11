@@ -20,11 +20,28 @@ const SLIDES = Array.from({ length: COUNT }, (_, i) =>
  */
 export function WinsGallery() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const openedByPointer = useRef(false);
   const [index, setIndex] = useState(0);
 
-  function open(i: number) {
+  function open(i: number, viaPointer: boolean) {
+    openedByPointer.current = viaPointer;
     setIndex(i);
     dialogRef.current?.showModal();
+  }
+
+  /**
+   * Closing a <dialog> restores focus to the element that opened it, and Chrome
+   * treats that restored focus as :focus-visible - which left the marquee
+   * paused until the next click. If the lightbox was opened with the mouse,
+   * drop that focus so the row starts moving again. Keyboard users keep their
+   * focus ring, and the pause with it.
+   */
+  function handleClose() {
+    if (!openedByPointer.current) return;
+    requestAnimationFrame(() => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement) active.blur();
+    });
   }
 
   function step(delta: number) {
@@ -39,7 +56,8 @@ export function WinsGallery() {
             <button
               key={slide}
               type="button"
-              onClick={() => open(i)}
+              // event.detail is 0 for keyboard activation, >0 for a real click.
+              onClick={(event) => open(i, event.detail > 0)}
               // The clone is on screen for half the loop, so it must stay
               // clickable - but it is aria-hidden, so keep it out of the tab
               // order to avoid a second, silent set of stops.
@@ -61,9 +79,10 @@ export function WinsGallery() {
 
       <dialog
         ref={dialogRef}
-        // Deliberately no reset on close. The close event fires asynchronously,
-        // so resetting here raced with the next thumbnail's click and could
-        // open the wrong image; keeping the last index is also better anyway.
+        // Deliberately no index reset on close: the close event fires
+        // asynchronously, so resetting raced with the next thumbnail's click
+        // and could open the wrong image. Keeping the last index is better too.
+        onClose={handleClose}
         onClick={(event) => {
           // Clicking the backdrop (the dialog itself, not its contents) closes.
           if (event.target === dialogRef.current) dialogRef.current?.close();

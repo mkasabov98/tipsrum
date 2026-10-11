@@ -8,9 +8,9 @@ export const SITE_NAME = "Tipsrum";
 
 export const CONTACT = {
   email: "info@tipsrum.com",
-  phone: "+359 88 977 6544",
+  phone: "+359 88 452 2915",
   // Digits only, for the tel: link.
-  phoneHref: "tel:+359889776544",
+  phoneHref: "tel:+359884522915",
 } as const;
 
 /** Where the 18+ badge points, matching the live site. */
