@@ -221,7 +221,7 @@ input::-ms-clear {
   will-change: transform;
 }
 .marquee:hover .marquee-track,
-.marquee:focus-within .marquee-track {
+.marquee:has(:focus-visible) .marquee-track {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {

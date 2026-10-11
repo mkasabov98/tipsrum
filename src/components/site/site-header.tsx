@@ -10,7 +10,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { MAIN_NAV, SITE_NAME } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader() {
+export function SiteHeader({ isAuthenticated }: { isAuthenticated: boolean }) {
   const pathname = usePathname();
   // Closed on link click rather than in an effect on pathname, which React 19
   // (rightly) flags as setting state during render.
@@ -21,7 +21,7 @@ export function SiteHeader() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="bg-card border-border sticky top-0 z-50 border-b">
+    <header className="bg-card border-border border-b">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
         <Link
           href="/"
@@ -60,24 +60,38 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "hidden h-9 px-4 sm:inline-flex",
-            )}
-          >
-            Вход
-          </Link>
-          <Link
-            href="/register"
-            className={cn(
-              buttonVariants({ size: "sm" }),
-              "hidden h-9 px-4 sm:inline-flex",
-            )}
-          >
-            Започни безплатно
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              href="/my_account"
+              className={cn(
+                buttonVariants({ size: "sm" }),
+                "hidden h-9 px-4 sm:inline-flex",
+              )}
+            >
+              Акаунт
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "sm" }),
+                  "hidden h-9 px-4 sm:inline-flex",
+                )}
+              >
+                Вход
+              </Link>
+              <Link
+                href="/register"
+                className={cn(
+                  buttonVariants({ size: "sm" }),
+                  "hidden h-9 px-4 sm:inline-flex",
+                )}
+              >
+                Започни безплатно
+              </Link>
+            </>
+          )}
           <button
             type="button"
             onClick={() => setOpen((current) => !current)}
@@ -120,20 +134,35 @@ export function SiteHeader() {
               </li>
             ))}
             <li className="mt-2 grid gap-2">
-              <Link
-                href="/login"
-                onClick={close}
-                className={cn(buttonVariants({ variant: "outline" }), "h-10")}
-              >
-                Вход
-              </Link>
-              <Link
-                href="/register"
-                onClick={close}
-                className={cn(buttonVariants(), "h-10")}
-              >
-                Започни безплатно
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  href="/my_account"
+                  onClick={close}
+                  className={cn(buttonVariants(), "h-10")}
+                >
+                  Акаунт
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={close}
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "h-10",
+                    )}
+                  >
+                    Вход
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={close}
+                    className={cn(buttonVariants(), "h-10")}
+                  >
+                    Започни безплатно
+                  </Link>
+                </>
+              )}
             </li>
           </ul>
         </nav>

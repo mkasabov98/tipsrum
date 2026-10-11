@@ -13,6 +13,9 @@ export const CONTACT = {
   phoneHref: "tel:+359889776544",
 } as const;
 
+/** Where the 18+ badge points, matching the live site. */
+export const RESPONSIBLE_GAMBLING_URL = "https://www.gamblingtherapy.org/bg/";
+
 export const SOCIAL = {
   telegram: "https://t.me/tipsrum_support",
   instagram: "https://www.instagram.com/tipsrum/",
@@ -26,11 +29,9 @@ export type NavItem = {
 };
 
 export const MAIN_NAV: readonly NavItem[] = [
-  { href: "/", label: "Начало" },
   { href: "/planove", label: "Планове" },
   { href: "/rezultati", label: "Резултати" },
   { href: "/polezno", label: "Полезно" },
-  { href: "/kontakti", label: "Контакти" },
 ];
 
 /** Footer column 1. The design groups the plan pages together. */

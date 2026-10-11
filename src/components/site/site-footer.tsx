@@ -2,12 +2,19 @@ import Image from "next/image";
 import Link from "next/link";
 
 import {
+  InstagramIcon,
+  TelegramIcon,
+  TikTokIcon,
+} from "@/components/site/brand-icons";
+
+import {
   COMPANY_NAV,
   CONTACT,
   FOOTER_ARTICLES,
   FOOTER_TAGLINE,
   PLAN_NAV,
   RESPONSIBLE_GAMBLING,
+  RESPONSIBLE_GAMBLING_URL,
   SITE_NAME,
   SOCIAL,
 } from "@/lib/site";
@@ -22,9 +29,9 @@ const columns = [
 ];
 
 const socials = [
-  { href: SOCIAL.telegram, label: "Telegram" },
-  { href: SOCIAL.instagram, label: "Instagram" },
-  { href: SOCIAL.tiktok, label: "TikTok" },
+  { href: SOCIAL.telegram, label: "Telegram", Icon: TelegramIcon },
+  { href: SOCIAL.instagram, label: "Instagram", Icon: InstagramIcon },
+  { href: SOCIAL.tiktok, label: "TikTok", Icon: TikTokIcon },
 ];
 
 export function SiteFooter() {
@@ -42,17 +49,23 @@ export function SiteFooter() {
           <p className="text-muted-foreground max-w-56 text-sm">
             {FOOTER_TAGLINE}
           </p>
-          <div className="border-border bg-card/60 flex max-w-64 items-start gap-3 rounded-lg border p-3">
+          <a
+            href={RESPONSIBLE_GAMBLING_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border-border bg-card/60 hover:border-loss/50 flex max-w-64 items-start gap-3 rounded-lg border p-3 transition-colors"
+          >
             <span
               aria-hidden
               className="text-loss border-loss/50 grid size-6 shrink-0 place-items-center rounded-full border text-[10px] font-bold"
             >
               18
             </span>
-            <p className="text-muted-foreground text-[11px] leading-snug">
+            <span className="text-muted-foreground text-[11px] leading-snug">
               {RESPONSIBLE_GAMBLING}
-            </p>
-          </div>
+              <span className="sr-only"> (помощ при хазартна зависимост)</span>
+            </span>
+          </a>
         </div>
 
         {columns.map((column) => (
@@ -83,15 +96,17 @@ export function SiteFooter() {
               {CONTACT.email}
             </a>
             <ul className="flex items-center gap-3">
-              {socials.map((item) => (
-                <li key={item.href}>
+              {socials.map(({ href, label, Icon }) => (
+                <li key={href}>
                   <a
-                    href={item.href}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={linkClass}
+                    aria-label={label}
+                    title={label}
+                    className="text-muted-foreground hover:text-foreground hover:border-foreground/30 border-border grid size-9 place-items-center rounded-full border transition-colors"
                   >
-                    {item.label}
+                    <Icon className="size-4" />
                   </a>
                 </li>
               ))}

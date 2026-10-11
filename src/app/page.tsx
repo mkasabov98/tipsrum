@@ -6,6 +6,7 @@ import {
   ShieldCheckIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { PlanCards } from "@/components/home/plan-cards";
@@ -79,9 +80,24 @@ export default async function Home() {
           site fits (show jumping and a casino table), so it runs on the
           gradient until a licensed racing photo exists. */}
       <section className="dark bg-background text-foreground relative overflow-hidden">
+        <Image
+          src="/hero-racing.webp"
+          alt=""
+          aria-hidden
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[60%_35%]"
+        />
+        {/* Scrim: the photo is bright, so the copy needs a dark wash under it
+            to stay readable. Heavier on the left, where the text sits. */}
         <div
           aria-hidden
-          className="bg-primary/20 pointer-events-none absolute -top-40 -right-32 size-[34rem] rounded-full blur-3xl"
+          className="from-background via-background/85 to-background/25 absolute inset-0 bg-gradient-to-r"
+        />
+        <div
+          aria-hidden
+          className="from-background absolute inset-0 bg-gradient-to-t to-transparent"
         />
         <div className="relative mx-auto w-full max-w-6xl px-4 py-20 sm:py-28">
           <Eyebrow>Прозрачни · Проследими · Доказани</Eyebrow>
