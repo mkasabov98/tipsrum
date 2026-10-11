@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
 
+import {
+  InstagramIcon,
+  TelegramIcon,
+  TikTokIcon,
+} from "@/components/site/brand-icons";
 import { ContactForm } from "@/components/site/contact-form";
 import { PageShell } from "@/components/site/page-shell";
 import { CONTACT, SOCIAL } from "@/lib/site";
@@ -43,20 +48,30 @@ export default function ContactPage() {
               В Telegram качваме залозите, а в социалните мрежи споделяме
               полезно съдържание.
             </p>
-            <ul className="grid gap-1">
+            <ul className="flex items-center gap-2">
               {[
-                { href: SOCIAL.telegram, label: "Telegram" },
-                { href: SOCIAL.instagram, label: "Instagram" },
-                { href: SOCIAL.tiktok, label: "TikTok" },
-              ].map((item) => (
-                <li key={item.href}>
+                {
+                  href: SOCIAL.telegram,
+                  label: "Telegram",
+                  Icon: TelegramIcon,
+                },
+                {
+                  href: SOCIAL.instagram,
+                  label: "Instagram",
+                  Icon: InstagramIcon,
+                },
+                { href: SOCIAL.tiktok, label: "TikTok", Icon: TikTokIcon },
+              ].map(({ href, label, Icon }) => (
+                <li key={href}>
                   <a
-                    href={item.href}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={linkClass}
+                    aria-label={label}
+                    title={label}
+                    className="border-border text-muted-foreground hover:text-primary hover:border-primary/40 grid size-10 place-items-center rounded-full border transition-colors"
                   >
-                    {item.label}
+                    <Icon className="size-4" />
                   </a>
                 </li>
               ))}

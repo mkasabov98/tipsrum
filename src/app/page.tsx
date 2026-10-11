@@ -81,23 +81,23 @@ export default async function Home() {
           gradient until a licensed racing photo exists. */}
       <section className="dark bg-background text-foreground relative overflow-hidden">
         <Image
-          src="/hero-racing.webp"
+          src="/hero-horses.webp"
           alt=""
           aria-hidden
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[50%_80%]"
+          className="object-cover object-[50%_40%]"
         />
         {/* Scrim: the photo is bright, so the copy needs a dark wash under it
             to stay readable. Heavier on the left, where the text sits. */}
         <div
           aria-hidden
-          className="from-background via-background/85 to-background/25 absolute inset-0 bg-gradient-to-r"
+          className="from-background via-background/70 absolute inset-0 bg-gradient-to-r to-transparent"
         />
         <div
           aria-hidden
-          className="from-background absolute inset-0 bg-gradient-to-t to-transparent"
+          className="from-background/90 absolute inset-0 bg-gradient-to-t via-transparent to-transparent"
         />
         <div className="relative mx-auto w-full max-w-6xl px-4 py-20 sm:py-28">
           <Eyebrow>Прозрачни · Проследими · Доказани</Eyebrow>

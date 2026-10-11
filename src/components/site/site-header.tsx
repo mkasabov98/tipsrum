@@ -23,23 +23,23 @@ export function SiteHeader({ isAuthenticated }: { isAuthenticated: boolean }) {
   return (
     <header className="bg-card border-border border-b">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4">
-        {/* Wordmark, menu and account actions all sit in one left-aligned group. */}
-        <div className="flex items-center gap-4 lg:gap-6">
-          <Link
-            href="/"
-            className="shrink-0"
-            aria-label={`${SITE_NAME} — начало`}
-          >
-            <Image
-              src="/logo.png"
-              alt={SITE_NAME}
-              width={1164}
-              height={234}
-              priority
-              className="h-6 w-auto sm:h-7"
-            />
-          </Link>
+        <Link
+          href="/"
+          className="shrink-0"
+          aria-label={`${SITE_NAME} — начало`}
+        >
+          <Image
+            src="/logo.png"
+            alt={SITE_NAME}
+            width={1164}
+            height={234}
+            priority
+            className="h-6 w-auto sm:h-7"
+          />
+        </Link>
 
+        {/* Menu and account actions share one right-aligned group. */}
+        <div className="flex items-center gap-4 lg:gap-6">
           <nav aria-label="Основна навигация" className="hidden md:block">
             <ul className="flex items-center gap-1">
               {MAIN_NAV.map((item) => (

@@ -70,7 +70,8 @@ export function SiteFooter() {
 
         {columns.map((column) => (
           <nav key={column.heading} className="grid content-start gap-3">
-            <p className="text-muted-foreground text-xs tracking-widest uppercase">
+            <p className="text-foreground flex items-center gap-2 text-xs font-semibold tracking-[0.18em] uppercase">
+              <span aria-hidden className="bg-brand-soft h-px w-4" />
               {column.heading}
             </p>
             <ul className="grid gap-2">
