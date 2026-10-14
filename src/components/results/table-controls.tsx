@@ -31,7 +31,10 @@ export function Pagination({
   ].sort((a, b) => a - b);
 
   return (
-    <nav aria-label={label} className="flex flex-wrap items-center gap-1">
+    <nav
+      aria-label={label}
+      className="flex flex-wrap items-center gap-1 sm:ml-auto"
+    >
       {current > 1 && (
         <Link
           href={hrefFor(current - 1)}
@@ -88,7 +91,7 @@ export function RowsPicker({
   hrefFor: (rows: number) => string;
 }) {
   return (
-    <div className="flex items-center gap-1 text-sm sm:ml-auto">
+    <div className="flex items-center gap-1 text-sm">
       <span className="text-muted-foreground mr-1">Редове:</span>
       {options.map((rows) => (
         <Link
@@ -111,7 +114,7 @@ export function RowsPicker({
   );
 }
 
-/** Pagination on the left, page size on the right; stacks on phones. */
+/** Page size on the left, pagination on the right; stacks on phones. */
 export function TableFooter({ children }: { children: React.ReactNode }) {
   return (
     <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

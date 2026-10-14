@@ -199,18 +199,18 @@ export function BetRegister({
 
       {total > 0 && (
         <TableFooter>
-          <Pagination
-            label="Страници на залозите"
-            current={query.page}
-            pages={pages}
-            hrefFor={(page) => resultsHref({ ...query, page }, "register")}
-          />
           <RowsPicker
             options={BET_ROWS}
             current={query.rows}
             hrefFor={(rows) =>
               resultsHref({ ...query, rows, page: 1 }, "register")
             }
+          />
+          <Pagination
+            label="Страници на залозите"
+            current={query.page}
+            pages={pages}
+            hrefFor={(page) => resultsHref({ ...query, page }, "register")}
           />
         </TableFooter>
       )}

@@ -144,18 +144,18 @@ export default async function ResultsPage({
           <MonthlySummary rows={monthRows} current={current} />
         </div>
         <TableFooter>
-          <Pagination
-            label="Страници на месеците"
-            current={query.mpage}
-            pages={monthPages}
-            hrefFor={(mpage) => resultsHref({ ...query, mpage }, "months")}
-          />
           <RowsPicker
             options={MONTH_ROWS}
             current={query.mrows}
             hrefFor={(mrows) =>
               resultsHref({ ...query, mrows, mpage: 1 }, "months")
             }
+          />
+          <Pagination
+            label="Страници на месеците"
+            current={query.mpage}
+            pages={monthPages}
+            hrefFor={(mpage) => resultsHref({ ...query, mpage }, "months")}
           />
         </TableFooter>
       </DarkSection>
