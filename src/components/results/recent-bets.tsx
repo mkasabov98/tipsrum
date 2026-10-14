@@ -1,4 +1,6 @@
-import { formatEurSigned } from "@/lib/format";
+import { ResultBadge } from "@/components/results/result-badge";
+import { formatEurSigned, formatShortDate } from "@/lib/format";
+import type { BetResult } from "@/lib/results";
 import { cn } from "@/lib/utils";
 
 export type BetRow = {
@@ -6,27 +8,13 @@ export type BetRow = {
   course: string;
   horse: string;
   odds: string | null;
-  result: "WON" | "PLACED" | "Lost" | "Void";
+  result: BetResult;
   profit: string;
 };
 
-const RESULT_LABELS: Record<BetRow["result"], string> = {
-  WON: "Печели",
-  PLACED: "Място",
-  Lost: "Губи",
-  Void: "Анулиран",
-};
-
-const RESULT_STYLES: Record<BetRow["result"], string> = {
-  WON: "bg-mint/15 text-win",
-  PLACED: "bg-brand-soft/20 text-win",
-  Lost: "bg-loss/10 text-loss",
-  Void: "bg-muted text-muted-foreground",
-};
-
 /**
- * The last few settled bets for a plan. Phase 4 adds the filterable, paginated
- * register on /rezultati; this is the short sample the plan pages show.
+ * The last few settled bets for a plan - the short sample the plan pages show.
+ * The full, filterable register is BetRegister on /rezultati.
  */
 export function RecentBets({ rows }: { rows: readonly BetRow[] }) {
   if (rows.length === 0) {
@@ -69,7 +57,7 @@ export function RecentBets({ rows }: { rows: readonly BetRow[] }) {
               className="border-border border-b last:border-0"
             >
               <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">
-                {row.date}
+                {formatShortDate(row.date)}
               </td>
               <td className="px-4 py-3">{row.course}</td>
               <td className="px-4 py-3 font-medium">{row.horse}</td>
@@ -77,14 +65,7 @@ export function RecentBets({ rows }: { rows: readonly BetRow[] }) {
                 {row.odds ? Number(row.odds).toFixed(2) : "—"}
               </td>
               <td className="px-4 py-3">
-                <span
-                  className={cn(
-                    "rounded-full px-2.5 py-1 text-[11px] font-semibold",
-                    RESULT_STYLES[row.result],
-                  )}
-                >
-                  {RESULT_LABELS[row.result]}
-                </span>
+                <ResultBadge result={row.result} />
               </td>
               <td
                 className={cn(
