@@ -1,4 +1,4 @@
-import { PLANS, type Plan } from "@/lib/results";
+import { PLANS, type Plan } from "@/lib/plans";
 
 /**
  * The /rezultati view state, all of it in the URL so every view - filters,

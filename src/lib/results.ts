@@ -3,13 +3,9 @@ import { cache } from "react";
 
 import { db } from "@/db";
 import { bets } from "@/db/schema";
+import type { Plan } from "@/lib/plans";
 
-export type Plan = "free" | "premium";
-
-export const PLAN_LABELS: Record<Plan, string> = {
-  premium: "Премиум",
-  free: "Безплатен",
-};
+export { PLAN_LABELS, PLANS, type Plan } from "@/lib/plans";
 
 /** "YYYY-MM" of today in Bulgaria - the month whose figures are still moving. */
 export function currentMonth(): string {
@@ -20,8 +16,6 @@ export function currentMonth(): string {
   }).format(new Date());
 }
 export type BetResult = (typeof bets.$inferSelect)["result"];
-
-export const PLANS: readonly Plan[] = ["premium", "free"];
 
 /**
  * Shared reads over the bets table, so the home page, the plan pages and

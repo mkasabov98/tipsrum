@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { MonthFilter } from "@/components/results/month-filter";
 import { ResultBadge } from "@/components/results/result-badge";
 import {
   Pagination,
@@ -8,7 +9,7 @@ import {
 } from "@/components/results/table-controls";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatEurSigned, formatMonth, formatShortDate } from "@/lib/format";
+import { formatEurSigned, formatShortDate } from "@/lib/format";
 import type { RegisterRow } from "@/lib/results";
 import {
   BET_ROWS,
@@ -54,21 +55,9 @@ export function BetRegister({
             <input key={name} type="hidden" name={name} value={value} />
           ),
         )}
-        <label className="flex flex-col gap-1.5 text-xs font-medium">
-          Месец
-          <select
-            name="month"
-            defaultValue={query.month ?? ""}
-            className="border-input bg-card h-10 rounded-md border px-3 text-sm sm:w-48"
-          >
-            <option value="">Всички месеци</option>
-            {months.map((month) => (
-              <option key={month} value={month}>
-                {formatMonth(month)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* Keyed on the URL's month so "Изчисти", back/forward or any link
+            that changes the filter resets the select's own state. */}
+        <MonthFilter key={query.month ?? "all"} query={query} months={months} />
         <label className="flex flex-1 flex-col gap-1.5 text-xs font-medium">
           Кон или хиподрум
           <Input
