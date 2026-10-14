@@ -23,9 +23,6 @@ export type BetResult = (typeof bets.$inferSelect)["result"];
 
 export const PLANS: readonly Plan[] = ["premium", "free"];
 
-/** Rows per page of the public register. */
-export const REGISTER_PAGE_SIZE = 50;
-
 /**
  * Shared reads over the bets table, so the home page, the plan pages and
  * /rezultati can never quote different numbers. Everything is derived from the
@@ -239,6 +236,8 @@ export type RegisterFilters = {
   month?: string;
   q?: string;
   page: number;
+  /** Rows per page. */
+  rows: number;
 };
 
 export type RegisterRow = {
@@ -263,7 +262,13 @@ const likePattern = (q: string) => `%${q.replace(/[\\%_]/g, "\\$&")}%`;
  * profit and drawdown each row had at the time (see `ledger`). Filters by
  * month and by a horse/course search.
  */
-export async function betRegister({ plan, month, q, page }: RegisterFilters) {
+export async function betRegister({
+  plan,
+  month,
+  q,
+  page,
+  rows: pageSize,
+}: RegisterFilters) {
   const conditions: SQL[] = [];
   if (month) conditions.push(sql`month = ${month}`);
   if (q) {
@@ -287,14 +292,14 @@ export async function betRegister({ plan, month, q, page }: RegisterFilters) {
       from ledger
       ${where}
       order by date desc, time desc nulls last, id desc
-      limit ${REGISTER_PAGE_SIZE}
-      offset ${(page - 1) * REGISTER_PAGE_SIZE}
+      limit ${pageSize}
+      offset ${(page - 1) * pageSize}
     `),
   ]);
 
   return {
     rows: [...rows],
     total,
-    pages: Math.max(1, Math.ceil(total / REGISTER_PAGE_SIZE)),
+    pages: Math.max(1, Math.ceil(total / pageSize)),
   };
 }

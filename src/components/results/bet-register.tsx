@@ -1,29 +1,22 @@
 import Link from "next/link";
 
 import { ResultBadge } from "@/components/results/result-badge";
+import {
+  Pagination,
+  RowsPicker,
+  TableFooter,
+} from "@/components/results/table-controls";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatEurSigned, formatMonth, formatShortDate } from "@/lib/format";
-import type { Plan, RegisterRow } from "@/lib/results";
+import type { RegisterRow } from "@/lib/results";
+import {
+  BET_ROWS,
+  hiddenParams,
+  resultsHref,
+  type ResultsQuery,
+} from "@/lib/results-query";
 import { cn } from "@/lib/utils";
-
-export type RegisterQuery = {
-  plan: Plan;
-  month?: string;
-  q?: string;
-  page: number;
-};
-
-/** Builds a /rezultati link, dropping defaults so URLs stay short. */
-export function registerHref(query: RegisterQuery): string {
-  const params = new URLSearchParams();
-  if (query.plan !== "premium") params.set("plan", query.plan);
-  if (query.month) params.set("month", query.month);
-  if (query.q) params.set("q", query.q);
-  if (query.page > 1) params.set("page", String(query.page));
-  const search = params.toString();
-  return `/rezultati${search ? `?${search}` : ""}#register`;
-}
 
 const tone = (value: number) => (value >= 0 ? "text-win" : "text-loss");
 
@@ -39,7 +32,7 @@ export function BetRegister({
   total,
   pages,
 }: {
-  query: RegisterQuery;
+  query: ResultsQuery;
   months: readonly string[];
   rows: readonly RegisterRow[];
   total: number;
@@ -54,8 +47,12 @@ export function BetRegister({
         method="get"
         className="flex flex-col gap-3 sm:flex-row sm:items-end"
       >
-        {query.plan !== "premium" && (
-          <input type="hidden" name="plan" value={query.plan} />
+        {/* Keep the plan, page size and the monthly table's position;
+            a new search starts the register again from page 1. */}
+        {hiddenParams(query, ["plan", "rows", "mpage", "mrows"]).map(
+          ([name, value]) => (
+            <input key={name} type="hidden" name={name} value={value} />
+          ),
         )}
         <label className="flex flex-col gap-1.5 text-xs font-medium">
           Месец
@@ -89,7 +86,10 @@ export function BetRegister({
           </Button>
           {filtered && (
             <Link
-              href={registerHref({ plan: query.plan, page: 1 })}
+              href={resultsHref(
+                { ...query, month: undefined, q: undefined, page: 1 },
+                "register",
+              )}
               className={cn(buttonVariants({ variant: "ghost" }), "h-10")}
             >
               Изчисти
@@ -197,61 +197,23 @@ export function BetRegister({
         </div>
       )}
 
-      {pages > 1 && <Pagination query={query} pages={pages} />}
+      {total > 0 && (
+        <TableFooter>
+          <Pagination
+            label="Страници на залозите"
+            current={query.page}
+            pages={pages}
+            hrefFor={(page) => resultsHref({ ...query, page }, "register")}
+          />
+          <RowsPicker
+            options={BET_ROWS}
+            current={query.rows}
+            hrefFor={(rows) =>
+              resultsHref({ ...query, rows, page: 1 }, "register")
+            }
+          />
+        </TableFooter>
+      )}
     </div>
-  );
-}
-
-/** First, previous, a window around the current page, next, last. */
-function Pagination({ query, pages }: { query: RegisterQuery; pages: number }) {
-  const current = query.page;
-  const shown = new Set(
-    [1, current - 1, current, current + 1, pages].filter(
-      (p) => p >= 1 && p <= pages,
-    ),
-  );
-  const numbers = [...shown].sort((a, b) => a - b);
-  const link = (page: number) => registerHref({ ...query, page });
-  const item =
-    "inline-flex h-10 min-w-10 items-center justify-center rounded-md px-3 text-sm";
-
-  return (
-    <nav
-      aria-label="Страници"
-      className="mt-6 flex flex-wrap items-center gap-1"
-    >
-      {current > 1 && (
-        <Link href={link(current - 1)} className={cn(item, "hover:bg-muted")}>
-          ← Предишна
-        </Link>
-      )}
-      {numbers.map((page, i) => (
-        <span key={page} className="flex items-center gap-1">
-          {i > 0 && page - numbers[i - 1] > 1 && (
-            <span aria-hidden className="text-muted-foreground px-1">
-              …
-            </span>
-          )}
-          <Link
-            href={link(page)}
-            aria-current={page === current ? "page" : undefined}
-            className={cn(
-              item,
-              "font-mono",
-              page === current
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted",
-            )}
-          >
-            {page}
-          </Link>
-        </span>
-      ))}
-      {current < pages && (
-        <Link href={link(current + 1)} className={cn(item, "hover:bg-muted")}>
-          Следваща →
-        </Link>
-      )}
-    </nav>
   );
 }
