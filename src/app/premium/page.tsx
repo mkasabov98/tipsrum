@@ -9,7 +9,12 @@ import { CtaBand } from "@/components/site/cta-band";
 import { Eyebrow, PageHero } from "@/components/site/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDate, formatEur } from "@/lib/format";
-import { monthlyProfit, planTotals, recentBets } from "@/lib/results";
+import {
+  monthlyProfit,
+  planTotals,
+  profitCurve,
+  recentBets,
+} from "@/lib/results";
 import { cn } from "@/lib/utils";
 
 const TITLE = "Премиум абонамент";
@@ -28,7 +33,8 @@ const TARGETS = [
 ];
 
 export default async function PremiumPlanPage() {
-  const [monthly, bets, totals] = await Promise.all([
+  const [curve, monthly, bets, totals] = await Promise.all([
+    profitCurve("premium"),
     monthlyProfit("premium"),
     recentBets("premium"),
     planTotals("premium"),
@@ -94,8 +100,10 @@ export default async function PremiumPlanPage() {
       </section>
 
       <PlanResults
+        plan="premium"
         title="Сумирана печалба на Премиум"
         lead={`${totals.bets} записани залога от ${formatDate(totals.first)} до ${formatDate(totals.last)}, в ${totals.months} месеца, от които ${totals.winningMonths} печеливши. Залогът за статистиката е ${formatEur(20)} на прогноза. Губещите месеци също са тук — нищо не е скрито.`}
+        curve={curve}
         monthly={monthly}
         bets={bets}
       />
