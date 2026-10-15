@@ -7,6 +7,9 @@ const nf = (decimals: number) =>
   new Intl.NumberFormat("bg-BG", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
+    // bg-BG skips grouping for 4-digit numbers by default ("€3860"), which
+    // reads inconsistently beside "€14 188" in the same column.
+    useGrouping: "always",
   });
 
 export function formatEur(
@@ -34,7 +37,10 @@ export function formatEurSigned(
 export function formatPercent(value: number | string): string {
   const n = typeof value === "string" ? Number(value) : value;
   if (!Number.isFinite(n)) return "—";
-  return `${n > 0 ? "+" : ""}${Math.round(n)}%`;
+  const rounded = Math.round(n);
+  // True minus sign, matching formatEurSigned in the same rows.
+  const sign = rounded > 0 ? "+" : rounded < 0 ? "−" : "";
+  return `${sign}${Math.abs(rounded)}%`;
 }
 
 /** Long Bulgarian date for article bylines: "18 януари 2025 г." */
@@ -49,12 +55,46 @@ export function formatDate(value: Date | string | null): string {
   }).format(date);
 }
 
-/** "2026-05" to "май 2026", for the month-by-month results. */
+/**
+ * "2026-05" to "Май 2026", for the month-by-month results. Capitalised
+ * because it always stands alone as a row or option label; the full year is
+ * kept since "Май 26" reads as the 26th of May.
+ */
 export function formatMonth(month: string): string {
   const [year, index] = month.split("-").map(Number);
   if (!year || !index) return month;
   const label = new Intl.DateTimeFormat("bg-BG", { month: "long" }).format(
     new Date(Date.UTC(year, index - 1, 1)),
   );
-  return `${label} ${year}`;
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
+}
+
+/** Compact numeric date for table rows: "05.10.2026". */
+export function formatShortDate(value: string): string {
+  const [year, month, day] = value.split("-");
+  return year && month && day ? `${day}.${month}.${year}` : value;
+}
+
+// Fixed three-letter forms: Intl's bg-BG "short" months vary in length and
+// carry a trailing dot, which is too ragged for a ticker or an axis.
+const MONTH_SHORT = [
+  "яну",
+  "фев",
+  "мар",
+  "апр",
+  "май",
+  "юни",
+  "юли",
+  "авг",
+  "сеп",
+  "окт",
+  "ное",
+  "дек",
+];
+
+/** Short month label for chart axes and the ticker: "2026-05" to "май 26". */
+export function formatMonthShort(month: string): string {
+  const [year, index] = month.split("-");
+  const label = MONTH_SHORT[Number(index) - 1];
+  return label && year ? `${label} ${year.slice(2)}` : month;
 }

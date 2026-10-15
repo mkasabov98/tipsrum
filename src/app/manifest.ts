@@ -1,0 +1,25 @@
+import type { MetadataRoute } from "next";
+
+/** Web app manifest: Android home-screen icons and colours. */
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "Tipsrum",
+    short_name: "Tipsrum",
+    start_url: "/",
+    display: "standalone",
+    background_color: "#f4f4f2",
+    theme_color: "#1f261c",
+    icons: [
+      {
+        src: "/android-chrome-192x192.png",
+        sizes: "192x192",
+        type: "image/png",
+      },
+      {
+        src: "/android-chrome-512x512.png",
+        sizes: "512x512",
+        type: "image/png",
+      },
+    ],
+  };
+}

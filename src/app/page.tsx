@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   BadgeCheckIcon,
   CheckIcon,
@@ -11,13 +11,15 @@ import Link from "next/link";
 
 import { PostCard } from "@/components/blog/post-card";
 import { PlanCards } from "@/components/home/plan-cards";
+import { MonthlyProfit, RoiNote } from "@/components/results/monthly-profit";
 import { WinsGallery } from "@/components/home/wins-gallery";
 import { DarkSection, Eyebrow } from "@/components/site/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { db } from "@/db";
 import { bets } from "@/db/schema";
-import { formatEur, formatEurSigned, formatPercent } from "@/lib/format";
+import { formatEur } from "@/lib/format";
 import { listPosts } from "@/lib/posts";
+import { currentMonth, monthlyProfit } from "@/lib/results";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -54,17 +56,7 @@ export default async function Home() {
     })
     .from(bets);
 
-  const monthly = await db
-    .select({
-      month: bets.month,
-      profit: sql<string>`round(sum(${bets.profit}), 2)`,
-      roi: sql<number>`round(sum(${bets.profit}) / nullif(sum(${bets.stake}), 0) * 100)`,
-    })
-    .from(bets)
-    .where(eq(bets.plan, "premium"))
-    .groupBy(bets.month)
-    .orderBy(desc(bets.month))
-    .limit(6);
+  const monthly = await monthlyProfit("premium", 6);
 
   const posts = await listPosts(3);
 
@@ -195,42 +187,18 @@ export default async function Home() {
       </section>
 
       <DarkSection>
-        <Eyebrow>Проследени резултати</Eyebrow>
+        <Eyebrow>Проследени резултати · Премиум</Eyebrow>
         <h2 className="mt-4 max-w-2xl text-3xl font-extrabold tracking-tight sm:text-4xl">
           Сумирана печалба, месец по месец
         </h2>
         <p className="text-muted-foreground mt-4 max-w-2xl">
-          Реални данни от старта на всеки план. Печелившите и губещите месеци —
-          всичко е тук.
+          Последните шест месеца на Премиум плана, изчислени директно от
+          записаните залози. Печелившите и губещите месеци — всичко е тук.
         </p>
-        <div className="border-border bg-card mt-8 overflow-hidden rounded-xl border">
-          <ul>
-            {monthly.map((row) => {
-              const roi = Number(row.roi ?? 0);
-              return (
-                <li
-                  key={row.month}
-                  className="border-border flex items-center justify-between gap-4 border-b px-5 py-4 last:border-0"
-                >
-                  <span className="font-mono text-sm">{row.month}</span>
-                  <span className="flex items-center gap-5">
-                    <span
-                      className={cn(
-                        "font-mono text-sm",
-                        roi >= 0 ? "text-win" : "text-loss",
-                      )}
-                    >
-                      {formatPercent(roi)}
-                    </span>
-                    <span className="w-24 text-right font-mono text-sm font-semibold">
-                      {formatEurSigned(row.profit)}
-                    </span>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
+        <div className="mt-8">
+          <MonthlyProfit rows={monthly} current={currentMonth()} />
         </div>
+        <RoiNote className="mt-3" />
         <p className="mt-5">
           <Link
             href="/rezultati"

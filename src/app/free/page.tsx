@@ -8,7 +8,12 @@ import { CtaBand } from "@/components/site/cta-band";
 import { Eyebrow, PageHero } from "@/components/site/page-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { formatDate, formatEur } from "@/lib/format";
-import { monthlyProfit, planTotals, recentBets } from "@/lib/results";
+import {
+  monthlyProfit,
+  planTotals,
+  profitCurve,
+  recentBets,
+} from "@/lib/results";
 import { cn } from "@/lib/utils";
 
 const TITLE = "Безплатен план";
@@ -42,7 +47,8 @@ const STEPS = [
 ];
 
 export default async function FreePlanPage() {
-  const [monthly, bets, totals] = await Promise.all([
+  const [curve, monthly, bets, totals] = await Promise.all([
+    profitCurve("free"),
     monthlyProfit("free"),
     recentBets("free"),
     planTotals("free"),
@@ -127,8 +133,10 @@ export default async function FreePlanPage() {
       </section>
 
       <PlanResults
+        plan="free"
         title="Сумирана печалба на безплатния план"
         lead={`${totals.bets} записани залога от ${formatDate(totals.first)} до ${formatDate(totals.last)}, в ${totals.months} месеца, от които ${totals.winningMonths} печеливши. Залогът за статистиката е ${formatEur(20)} на прогноза. Имаме и губещи месеци — показваме ги, защото нямаме какво да крием.`}
+        curve={curve}
         monthly={monthly}
         bets={bets}
       />

@@ -14,7 +14,8 @@ export const CONTACT = {
 } as const;
 
 /** Where the 18+ badge points, matching the live site. */
-export const RESPONSIBLE_GAMBLING_URL = "https://www.gamblingtherapy.org/bg/";
+// Bulgarian treatment service for gambling addiction (Сдружение "Солидарност").
+export const RESPONSIBLE_GAMBLING_URL = "https://www.solidarnost-bg.org/";
 
 export const SOCIAL = {
   telegram: "https://t.me/tipsrum_support",

@@ -112,8 +112,10 @@ export function WinsGallery() {
               height={1378}
               className="max-h-[82vh] w-auto rounded-xl object-contain"
             />
-            <figcaption className="text-center font-mono text-xs text-white/70">
-              {index + 1} / {COUNT}
+            {/* No visible counter (design feedback); screen readers still
+                get their position in the set. */}
+            <figcaption className="sr-only">
+              Снимка {index + 1} от {COUNT}
             </figcaption>
           </figure>
 

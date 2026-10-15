@@ -1,33 +1,9 @@
-import { desc, eq, sql } from "drizzle-orm";
-
 import { Marquee } from "@/components/site/marquee";
-import { db } from "@/db";
-import { bets } from "@/db/schema";
-import { formatPercent } from "@/lib/format";
+import { formatMonthShort, formatPercent } from "@/lib/format";
+import { monthlyProfit } from "@/lib/results";
 import { cn } from "@/lib/utils";
 
 const MONTHS_SHOWN = 12;
-
-// "2026-09" -> "СЕП 26", matching the design's compact ticker labels.
-const MONTH_LABELS = [
-  "ЯНУ",
-  "ФЕВ",
-  "МАР",
-  "АПР",
-  "МАЙ",
-  "ЮНИ",
-  "ЮЛИ",
-  "АВГ",
-  "СЕП",
-  "ОКТ",
-  "НОЕ",
-  "ДЕК",
-];
-
-function label(month: string): string {
-  const [year, m] = month.split("-");
-  return `${MONTH_LABELS[Number(m) - 1]} ${year.slice(2)}`;
-}
 
 /**
  * The strip above the header: premium ROI for the last 12 months, scrolling
@@ -35,16 +11,7 @@ function label(month: string): string {
  * placeholders.
  */
 export async function ResultsTicker() {
-  const rows = await db
-    .select({
-      month: bets.month,
-      roi: sql<number>`round(sum(${bets.profit}) / nullif(sum(${bets.stake}), 0) * 100)`,
-    })
-    .from(bets)
-    .where(eq(bets.plan, "premium"))
-    .groupBy(bets.month)
-    .orderBy(desc(bets.month))
-    .limit(MONTHS_SHOWN);
+  const rows = await monthlyProfit("premium", MONTHS_SHOWN);
 
   if (rows.length === 0) return null;
 
@@ -59,7 +26,7 @@ export async function ResultsTicker() {
         className="border-border/60 flex shrink-0 items-center gap-2 border-l px-4 py-2 font-mono text-[11px] tracking-wider"
       >
         <span className="text-muted-foreground uppercase">
-          {label(row.month)}
+          {formatMonthShort(row.month)}
         </span>
         <span className={cn(up ? "text-win" : "text-loss")}>
           {formatPercent(roi)}

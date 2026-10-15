@@ -40,11 +40,11 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div className="grid content-start gap-4">
           <Image
-            src="/logo-light.png"
+            src="/logo-footer.png"
             alt={SITE_NAME}
-            width={1164}
-            height={234}
-            className="h-6 w-auto"
+            width={1622}
+            height={274}
+            className="h-6 w-auto sm:h-7"
           />
           <p className="text-muted-foreground max-w-56 text-sm">
             {FOOTER_TAGLINE}
