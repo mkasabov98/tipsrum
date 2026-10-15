@@ -55,14 +55,18 @@ export function formatDate(value: Date | string | null): string {
   }).format(date);
 }
 
-/** "2026-05" to "май 2026", for the month-by-month results. */
+/**
+ * "2026-05" to "Май 2026", for the month-by-month results. Capitalised
+ * because it always stands alone as a row or option label; the full year is
+ * kept since "Май 26" reads as the 26th of May.
+ */
 export function formatMonth(month: string): string {
   const [year, index] = month.split("-").map(Number);
   if (!year || !index) return month;
   const label = new Intl.DateTimeFormat("bg-BG", { month: "long" }).format(
     new Date(Date.UTC(year, index - 1, 1)),
   );
-  return `${label} ${year}`;
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)} ${year}`;
 }
 
 /** Compact numeric date for table rows: "05.10.2026". */
