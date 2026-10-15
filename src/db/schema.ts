@@ -56,6 +56,9 @@ export const user = pgTable("user", {
   entitlement: text("entitlement").notNull().default("free"),
   termsAcceptedAt: timestamp("terms_accepted_at"),
   marketingOptIn: boolean("marketing_opt_in").notNull().default(false),
+  // One Stripe customer per account, created on first checkout and reused for
+  // later checkouts and the Customer Portal. Written by server code only.
+  stripeCustomerId: text("stripe_customer_id").unique(),
 });
 
 export const session = pgTable(
