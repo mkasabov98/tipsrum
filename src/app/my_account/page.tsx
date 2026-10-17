@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { SubscriptionCard } from "@/components/account/subscription-card";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import {
   Card,
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getAccountSubscription } from "@/lib/billing";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -21,12 +23,18 @@ const PLAN_LABELS: Record<string, string> = {
   premium: "Премиум",
 };
 
-export default async function MyAccountPage() {
+export default async function MyAccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   // The proxy only checks that a cookie exists; this is the real check.
   const session = await getSession();
   if (!session) redirect("/login?redirect=/my_account");
 
   const { user } = session;
+  const { checkout } = await searchParams;
+  const subscription = await getAccountSubscription(user.id);
   const rows = [
     { label: "Имейл", value: user.email },
     {
@@ -36,7 +44,7 @@ export default async function MyAccountPage() {
   ];
 
   return (
-    <main className="flex flex-1 justify-center px-4 py-12">
+    <main className="flex flex-1 flex-col items-center gap-6 px-4 py-12">
       <Card className="h-fit w-full max-w-lg">
         <CardHeader>
           <CardTitle className="text-xl">Моят профил</CardTitle>
@@ -58,6 +66,11 @@ export default async function MyAccountPage() {
           <SignOutButton />
         </CardFooter>
       </Card>
+      <SubscriptionCard
+        isPremium={user.entitlement === "premium"}
+        subscription={subscription}
+        justPaid={checkout === "success"}
+      />
     </main>
   );
 }

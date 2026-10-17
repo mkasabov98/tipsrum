@@ -36,6 +36,20 @@
       "when": 1791735722569,
       "tag": "0004_pale_spyke",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792083979976,
+      "tag": "0005_early_jane_foster",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792257645063,
+      "tag": "0006_boring_reptil",
+      "breakpoints": true
     }
   ]
 }
