@@ -22,10 +22,9 @@ export const betResultEnum = pgEnum("bet_result", [
   "Lost",
   "Void",
 ]);
-export const paymentProviderEnum = pgEnum("payment_provider", [
-  "stripe",
-  "paypal",
-]);
+// Stripe is the only payment provider (PayPal dropped by the owners, 2026-10).
+// Kept as an enum so a future provider is a migration, not a redesign.
+export const paymentProviderEnum = pgEnum("payment_provider", ["stripe"]);
 export const inviteStatusEnum = pgEnum("invite_status", [
   "pending",
   "sent",
@@ -131,7 +130,7 @@ export const subscriptions = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     provider: paymentProviderEnum("provider").notNull(),
-    // Stripe customer id / PayPal payer id.
+    // Stripe customer id.
     providerCustomerId: text("provider_customer_id"),
     providerSubscriptionId: text("provider_subscription_id").notNull(),
     // Provider status verbatim (active, past_due, canceled, ...). Webhook
