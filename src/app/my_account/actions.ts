@@ -8,9 +8,9 @@ import { user } from "@/db/schema";
 import { getSession } from "@/lib/session";
 import { appOrigin, premiumPriceId, stripe } from "@/lib/stripe";
 
-async function requireUser() {
+async function requireUser(returnTo: string) {
   const session = await getSession();
-  if (!session) redirect("/login?redirect=/my_account");
+  if (!session) redirect(`/login?redirect=${returnTo}`);
   return session.user;
 }
 
@@ -47,10 +47,11 @@ async function ensureStripeCustomer(account: {
 }
 
 export async function startPremiumCheckout(): Promise<void> {
-  const account = await requireUser();
+  const account = await requireUser("/premium_checkout");
 
-  // An active member must never be able to pay a second time.
-  if (account.entitlement === "premium") redirect("/my_account");
+  // An active member must never be able to pay a second time; the checkout
+  // page shows them the "already premium" screen instead.
+  if (account.entitlement === "premium") redirect("/premium_checkout");
 
   const customer = await ensureStripeCustomer(account);
 
@@ -73,9 +74,10 @@ export async function startPremiumCheckout(): Promise<void> {
     line_items: [{ price: await premiumPriceId(), quantity: 1 }],
     subscription_data: { metadata: { userId: account.id } },
     locale: "bg",
-    // The redirect only says "we are processing"; the webhook grants access.
-    success_url: `${origin}/my_account?checkout=success`,
-    cancel_url: `${origin}/my_account`,
+    // The return only decides which screen to show; the webhook grants access.
+    // Stripe fills in the placeholder, letting the page confirm the payment.
+    success_url: `${origin}/premium_checkout?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/premium_checkout?canceled=1`,
   });
 
   if (!checkout.url) throw new Error("Stripe returned no checkout URL");
@@ -83,7 +85,7 @@ export async function startPremiumCheckout(): Promise<void> {
 }
 
 export async function openBillingPortal(): Promise<void> {
-  const account = await requireUser();
+  const account = await requireUser("/my_account");
 
   const [row] = await db
     .select({ customerId: user.stripeCustomerId })

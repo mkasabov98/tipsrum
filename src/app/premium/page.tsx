@@ -54,9 +54,10 @@ export default async function PremiumPlanPage() {
         ]}
       >
         <div className="mt-8 flex flex-wrap gap-3">
-          {/* Checkout arrives in Phase 6; until then the funnel starts with an
-              account, which the subscription will be attached to. */}
-          <Link href="/register" className={cn(buttonVariants(), "h-11 px-5")}>
+          <Link
+            href="/premium_checkout"
+            className={cn(buttonVariants(), "h-11 px-5")}
+          >
             Към Премиум групата — 25€/месец →
           </Link>
           <Link
@@ -111,7 +112,10 @@ export default async function PremiumPlanPage() {
       <CtaBand
         title="Присъедини се към Премиум"
         lead="25€ на месец. До 6 прогнози дневно, ексклузивна група и гаранция на парите."
-        primary={{ href: "/register", label: "Стани Премиум — 25€/месец" }}
+        primary={{
+          href: "/premium_checkout",
+          label: "Стани Премиум — 25€/месец",
+        }}
         secondary={{ href: "/kontakti", label: "Имам въпрос" }}
       />
     </main>

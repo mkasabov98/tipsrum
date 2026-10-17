@@ -12,8 +12,13 @@ export default async function RegisterPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const redirectTo = redirectTargetFromSearchParams(await searchParams);
+  const params = await searchParams;
+  const redirectTo = redirectTargetFromSearchParams(params);
   if (await getSession()) redirect(redirectTo);
 
-  return <RegisterForm redirectTo={redirectTo} />;
+  // A plain sign-up is the free funnel, so it ends on the free welcome page.
+  const explicit = params.redirect ?? params.arm_redirect;
+  return (
+    <RegisterForm redirectTo={explicit ? redirectTo : "/free_thank_you"} />
+  );
 }

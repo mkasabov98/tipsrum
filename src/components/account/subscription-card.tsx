@@ -5,7 +5,6 @@ import {
   startPremiumCheckout,
 } from "@/app/my_account/actions";
 import { ActionButton } from "@/components/account/action-button";
-import { AwaitEntitlement } from "@/components/account/await-entitlement";
 import {
   Card,
   CardContent,
@@ -52,19 +51,15 @@ function describe(sub: AccountSubscription, isPremium: boolean): Row[] {
 export function SubscriptionCard({
   isPremium,
   subscription,
-  justPaid,
 }: {
   isPremium: boolean;
   subscription: AccountSubscription | undefined;
-  justPaid: boolean;
 }) {
-  const processing = justPaid && !isPremium;
-
   return (
     <Card className="h-fit w-full max-w-lg">
       <CardHeader>
         <CardTitle className="text-xl">Абонамент</CardTitle>
-        {!subscription && !processing && (
+        {!subscription && (
           <CardDescription>
             Премиум планът носи до 6 съвета на ден в затворената Telegram група.
             25 € на месец, с 30 дни гаранция за връщане на парите.
@@ -73,26 +68,18 @@ export function SubscriptionCard({
       </CardHeader>
 
       <CardContent>
-        {processing ? (
-          <p className="text-sm" role="status">
-            Обработваме плащането. Страницата ще се обнови сама след няколко
-            секунди.
-            <AwaitEntitlement />
-          </p>
-        ) : (
-          subscription && (
-            <dl className="grid gap-3 text-sm">
-              {describe(subscription, isPremium).map((row) => (
-                <div
-                  key={row.label}
-                  className="border-border flex justify-between gap-4 border-b pb-3 last:border-0 last:pb-0"
-                >
-                  <dt className="text-muted-foreground">{row.label}</dt>
-                  <dd className="text-right font-medium">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-          )
+        {subscription && (
+          <dl className="grid gap-3 text-sm">
+            {describe(subscription, isPremium).map((row) => (
+              <div
+                key={row.label}
+                className="border-border flex justify-between gap-4 border-b pb-3 last:border-0 last:pb-0"
+              >
+                <dt className="text-muted-foreground">{row.label}</dt>
+                <dd className="text-right font-medium">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
         )}
         {isPremium && subscription?.status === "past_due" && (
           <p className="text-muted-foreground mt-4 text-sm">
@@ -113,23 +100,21 @@ export function SubscriptionCard({
           )}
       </CardContent>
 
-      {!processing && (
-        <CardFooter>
-          {isPremium ? (
-            <form action={openBillingPortal} className="w-full sm:w-auto">
-              <ActionButton variant="outline" pendingLabel="Отваряне…">
-                Управление на абонамента
-              </ActionButton>
-            </form>
-          ) : (
-            <form action={startPremiumCheckout} className="w-full sm:w-auto">
-              <ActionButton pendingLabel="Пренасочване…">
-                Стани Премиум · 25 €/месец
-              </ActionButton>
-            </form>
-          )}
-        </CardFooter>
-      )}
+      <CardFooter>
+        {isPremium ? (
+          <form action={openBillingPortal} className="w-full sm:w-auto">
+            <ActionButton variant="outline" pendingLabel="Отваряне…">
+              Управление на абонамента
+            </ActionButton>
+          </form>
+        ) : (
+          <form action={startPremiumCheckout} className="w-full sm:w-auto">
+            <ActionButton pendingLabel="Пренасочване…">
+              Стани Премиум · 25 €/месец
+            </ActionButton>
+          </form>
+        )}
+      </CardFooter>
     </Card>
   );
 }

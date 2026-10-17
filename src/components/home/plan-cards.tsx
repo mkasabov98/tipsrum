@@ -43,9 +43,7 @@ export const PLANS: readonly Plan[] = [
       "Очаквана месечна печалба ~€420",
       "30-дневна гаранция на парите",
     ],
-    // Checkout arrives in Phase 6; until then the Premium funnel also starts
-    // with an account, exactly as the button on /premium does.
-    cta: { href: "/register", label: "Стани Премиум" },
+    cta: { href: "/premium_checkout", label: "Стани Премиум" },
     detail: { href: "/premium", label: "Повече за плана" },
     recommended: true,
   },

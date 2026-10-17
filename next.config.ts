@@ -14,14 +14,6 @@ const nextConfig: NextConfig = {
       // /pro in places. One page each now, with the old paths pointing at it.
       { source: "/bezplaten", destination: "/free", permanent: true },
       { source: "/pro", destination: "/premium", permanent: true },
-      // Checkout arrives in Phase 6; until then both funnels start with an
-      // account, so the old checkout URLs land on registration.
-      { source: "/free_checkout", destination: "/register", permanent: false },
-      {
-        source: "/premium_checkout",
-        destination: "/register",
-        permanent: false,
-      },
     ];
   },
 };
