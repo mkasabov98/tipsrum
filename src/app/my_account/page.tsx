@@ -23,17 +23,12 @@ const PLAN_LABELS: Record<string, string> = {
   premium: "Премиум",
 };
 
-export default async function MyAccountPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ checkout?: string }>;
-}) {
+export default async function MyAccountPage() {
   // The proxy only checks that a cookie exists; this is the real check.
   const session = await getSession();
   if (!session) redirect("/login?redirect=/my_account");
 
   const { user } = session;
-  const { checkout } = await searchParams;
   const subscription = await getAccountSubscription(user.id);
   const rows = [
     { label: "Имейл", value: user.email },
@@ -69,7 +64,6 @@ export default async function MyAccountPage({
       <SubscriptionCard
         isPremium={user.entitlement === "premium"}
         subscription={subscription}
-        justPaid={checkout === "success"}
       />
     </main>
   );

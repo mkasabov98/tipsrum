@@ -73,7 +73,25 @@ function validate(values: Values): FieldErrors<Values> {
   return errors;
 }
 
-export function RegisterForm({ redirectTo }: { redirectTo: string }) {
+// The free welcome page is only for new accounts; someone who already has one
+// logs in to their profile as usual.
+const PLAIN_LOGIN_TARGETS = ["/my_account", "/free_thank_you"];
+
+function loginHref(redirectTo: string): string {
+  return PLAIN_LOGIN_TARGETS.includes(redirectTo)
+    ? "/login"
+    : `/login?redirect=${encodeURIComponent(redirectTo)}`;
+}
+
+export function RegisterForm({
+  redirectTo,
+  title = "Регистрация",
+  description = "Безплатна е и отнема по-малко от 30 секунди.",
+}: {
+  redirectTo: string;
+  title?: string;
+  description?: string;
+}) {
   const router = useRouter();
   const { values, isValid, field, checkbox } = useAuthForm(EMPTY, validate);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -110,10 +128,8 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Регистрация</CardTitle>
-        <CardDescription>
-          Безплатна е и отнема по-малко от 30 секунди.
-        </CardDescription>
+        <CardTitle className="text-xl">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit} noValidate>
         <CardContent className="grid gap-4">
@@ -165,7 +181,7 @@ export function RegisterForm({ redirectTo }: { redirectTo: string }) {
           </SubmitButton>
           <p className="text-muted-foreground text-sm">
             Вече имаш профил?{" "}
-            <Link href="/login" className={inlineLink}>
+            <Link href={loginHref(redirectTo)} className={inlineLink}>
               Влез
             </Link>
           </p>

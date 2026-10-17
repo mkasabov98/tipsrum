@@ -73,3 +73,14 @@ export const FOOTER_TAGLINE =
 // Required on a gambling-adjacent site; shown in the footer of every page.
 export const RESPONSIBLE_GAMBLING =
   "Хазартът води до пристрастяване! Трябва да бъдете над 18 години, за да използвате нашия сайт. Бъдете разумни.";
+
+/**
+ * Where members are sent on Telegram. The free group is open, so its link is
+ * handed out directly. Premium goes through the bot, which gates the channel;
+ * Phase 7 replaces this plain bot link with a personal one-time deep link.
+ */
+export const TELEGRAM = {
+  freeGroup: "https://t.me/tipsrumbezplaten",
+  premiumBot: "https://t.me/TipsrumPremiumBot",
+  premiumBotHandle: "@TipsrumPremiumBot",
+} as const;
