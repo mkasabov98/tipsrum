@@ -145,6 +145,13 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind v4's preflight gives buttons the default arrow. Clickable ones get
+     the hand back; disabled ones keep the arrow. In the base layer, so a
+     utility such as cursor-zoom-in still wins. */
+  button:not(:disabled):not([aria-disabled="true"]):not([data-disabled]),
+  [role="button"]:not([aria-disabled="true"]):not([data-disabled]) {
+    cursor: pointer;
+  }
 }
 
 /* Edge draws its own password reveal control; we provide our own toggle. */
