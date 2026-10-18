@@ -13,7 +13,7 @@ import { syncTelegramAccess } from "@/lib/telegram";
 export const PREMIUM_STATUSES = ["active", "trialing", "past_due"];
 
 /** Checkouts that never completed - not worth showing on the account page. */
-const ABANDONED_STATUSES = ["incomplete", "incomplete_expired"];
+export const ABANDONED_STATUSES = ["incomplete", "incomplete_expired"];
 
 export const GUARANTEE_DAYS = 30;
 
