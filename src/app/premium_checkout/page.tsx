@@ -5,7 +5,6 @@ import { startPremiumCheckout } from "@/app/my_account/actions";
 import { ActionButton } from "@/components/account/action-button";
 import { RegisterForm } from "@/components/auth/register-form";
 import { AwaitPremium } from "@/components/checkout/await-premium";
-import { CopyEmail } from "@/components/checkout/copy-email";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +17,8 @@ import {
 import { GUARANTEE_DAYS } from "@/lib/billing";
 import { isRecentCheckoutBy } from "@/lib/checkout";
 import { getSession } from "@/lib/session";
-import { TELEGRAM } from "@/lib/site";
+import { SOCIAL } from "@/lib/site";
+import { premiumBotLink } from "@/lib/telegram";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -62,12 +62,13 @@ export default async function PremiumCheckoutPage({
   const justPaid = await isRecentCheckoutBy(checkoutId, user.id);
 
   if (isPremium) {
+    const botLink = await premiumBotLink(user.id);
     return (
       <Shell>
         {justPaid ? (
-          <PaymentSucceeded email={user.email} />
+          <PaymentSucceeded botLink={botLink} />
         ) : (
-          <AlreadyPremium email={user.email} />
+          <AlreadyPremium botLink={botLink} />
         )}
       </Shell>
     );
@@ -92,10 +93,27 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function BotButton({ children }: { children: React.ReactNode }) {
+/** The member's personal START link; null only when the bot is not configured. */
+type BotLink = string | null;
+
+function BotButton({
+  botLink,
+  children,
+}: {
+  botLink: BotLink;
+  children: React.ReactNode;
+}) {
+  if (!botLink) {
+    return (
+      <p className="text-sm" role="status">
+        Telegram ботът временно не е достъпен. Пиши ни на <SupportLink /> и ще
+        те добавим.
+      </p>
+    );
+  }
   return (
     <a
-      href={TELEGRAM.premiumBot}
+      href={botLink}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}
@@ -105,16 +123,30 @@ function BotButton({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SupportLink() {
+  return (
+    <a
+      href={SOCIAL.telegram}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary underline"
+    >
+      @tipsrum_support
+    </a>
+  );
+}
+
 function BotFallback() {
   return (
     <p className="text-muted-foreground text-sm">
-      Линкът не работи? Потърси {TELEGRAM.premiumBotHandle} в Telegram.
+      Бутонът не работи? Увери се, че имаш инсталиран Telegram, и опитай пак.
+      Ако пак не става, пиши ни на <SupportLink />.
     </p>
   );
 }
 
 /** State A. */
-function AlreadyPremium({ email }: { email: string }) {
+function AlreadyPremium({ botLink }: { botLink: BotLink }) {
   return (
     <Card>
       <CardHeader>
@@ -125,15 +157,14 @@ function AlreadyPremium({ email }: { email: string }) {
           Няма нужда да плащате отново. Вашият абонамент е активен.
         </CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-3 text-sm">
+      <CardContent className="text-sm">
         <p>
-          Ако още не си в групата, отвори бота, натисни START и въведи имейла, с
-          който си се регистрирал:
+          Ако още не си в Премиум канала, отвори бота и натисни START. Той ще те
+          разпознае и ще ти изпрати личен линк за канала.
         </p>
-        <CopyEmail email={email} />
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
-        <BotButton>Към Telegram групата</BotButton>
+        <BotButton botLink={botLink}>Към Telegram канала</BotButton>
         <Link href="/my_account" className="text-primary text-sm underline">
           Управление на абонамента
         </Link>
@@ -143,7 +174,7 @@ function AlreadyPremium({ email }: { email: string }) {
 }
 
 /** State B. */
-function PaymentSucceeded({ email }: { email: string }) {
+function PaymentSucceeded({ botLink }: { botLink: BotLink }) {
   return (
     <Card>
       <CardHeader>
@@ -154,15 +185,14 @@ function PaymentSucceeded({ email }: { email: string }) {
         <ol className="grid list-decimal gap-3 pl-5 text-sm">
           <li>Натисни бутона по-долу, за да отвориш нашия Telegram бот.</li>
           <li>Натисни START в долната част на чата.</li>
-          <li className="grid gap-2">
-            Ботът ще поиска имейла ти. Въведи точно този, с който си се
-            регистрирал:
-            <CopyEmail email={email} />
+          <li>
+            Ботът ще те разпознае и ще ти изпрати личен линк за Премиум канала.
+            Линкът е валиден 24 часа и е само за теб.
           </li>
         </ol>
       </CardContent>
       <CardFooter className="flex flex-col items-start gap-4">
-        <BotButton>Отвори Telegram бот</BotButton>
+        <BotButton botLink={botLink}>Отвори Telegram бот</BotButton>
         <BotFallback />
       </CardFooter>
     </Card>

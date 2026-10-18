@@ -1,9 +1,10 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, ne, notInArray } from "drizzle-orm";
 import type Stripe from "stripe";
 
 import { db } from "@/db";
 import { subscriptions, user } from "@/db/schema";
 import {
+  ABANDONED_STATUSES,
   GUARANTEE_DAYS,
   PREMIUM_STATUSES,
   recomputeEntitlement,
@@ -36,6 +37,29 @@ async function resolveUserId(sub: Stripe.Subscription): Promise<string | null> {
 }
 
 /**
+ * The money-back guarantee covers only an account's first paid subscription
+ * (terms, section 7): a member who is refunded and subscribes again gets no new
+ * window. Checkouts that never completed do not count as a first subscription.
+ */
+async function hasEarlierSubscription(
+  userId: string,
+  subscriptionId: string,
+): Promise<boolean> {
+  const [earlier] = await db
+    .select({ id: subscriptions.id })
+    .from(subscriptions)
+    .where(
+      and(
+        eq(subscriptions.userId, userId),
+        ne(subscriptions.providerSubscriptionId, subscriptionId),
+        notInArray(subscriptions.status, ABANDONED_STATUSES),
+      ),
+    )
+    .limit(1);
+  return Boolean(earlier);
+}
+
+/**
  * Mirrors one Stripe subscription onto our `subscriptions` row and re-derives
  * the owner's entitlement. Callers pass a subscription freshly retrieved from the
  * API, never the event payload: Stripe does not guarantee event order, so the
@@ -61,6 +85,11 @@ export async function syncStripeSubscription(
     updatedAt: new Date(),
   };
 
+  // The guarantee runs from the first payment and is set once, on insert.
+  const refundEligibleUntil = (await hasEarlierSubscription(userId, sub.id))
+    ? null
+    : new Date(sub.start_date * 1000 + GUARANTEE_DAYS * DAY_MS);
+
   await db
     .insert(subscriptions)
     .values({
@@ -68,10 +97,7 @@ export async function syncStripeSubscription(
       userId,
       provider: "stripe",
       providerSubscriptionId: sub.id,
-      // The guarantee runs from the first payment and is set once, on insert.
-      refundEligibleUntil: new Date(
-        sub.start_date * 1000 + GUARANTEE_DAYS * DAY_MS,
-      ),
+      refundEligibleUntil,
       ...fields,
     })
     .onConflictDoUpdate({

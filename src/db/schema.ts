@@ -156,6 +156,11 @@ export const subscriptions = pgTable(
 /* Telegram (Phase 7)                                                         */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * One row per account: which Telegram user it is bound to, and the state of that
+ * person's access to the premium channel. The Telegram ID is what makes removal
+ * possible when a subscription ends.
+ */
 export const telegramLinks = pgTable(
   "telegram_links",
   {
@@ -163,10 +168,15 @@ export const telegramLinks = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    // Populated once the user actually starts the bot.
+    // Populated once the user presses START through their personal deep link.
     telegramUserId: text("telegram_user_id").unique(),
-    // Signed one-time deep-link token issued at checkout success.
-    inviteToken: text("invite_token").unique(),
+    // For the owners' reference only; people can change it at any time.
+    telegramUsername: text("telegram_username"),
+    // One-time token carried in t.me/<bot>?start=<token>; cleared when used.
+    startToken: text("start_token").unique(),
+    startTokenExpiresAt: timestamp("start_token_expires_at"),
+    // The latest personal channel invite, kept so it can be revoked.
+    inviteLink: text("invite_link"),
     inviteStatus: inviteStatusEnum("invite_status")
       .notNull()
       .default("pending"),
@@ -175,7 +185,7 @@ export const telegramLinks = pgTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
-  (t) => [index("telegram_links_user_id_idx").on(t.userId)],
+  (t) => [uniqueIndex("telegram_links_user_id_idx").on(t.userId)],
 );
 
 /* -------------------------------------------------------------------------- */

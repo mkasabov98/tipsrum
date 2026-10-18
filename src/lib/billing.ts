@@ -2,6 +2,7 @@ import { and, desc, eq, inArray, notInArray } from "drizzle-orm";
 
 import { db } from "@/db";
 import { subscriptions, user } from "@/db/schema";
+import { syncTelegramAccess } from "@/lib/telegram";
 
 /**
  * Provider statuses that keep premium access. `past_due` is included on purpose:
@@ -12,7 +13,7 @@ import { subscriptions, user } from "@/db/schema";
 export const PREMIUM_STATUSES = ["active", "trialing", "past_due"];
 
 /** Checkouts that never completed - not worth showing on the account page. */
-const ABANDONED_STATUSES = ["incomplete", "incomplete_expired"];
+export const ABANDONED_STATUSES = ["incomplete", "incomplete_expired"];
 
 export const GUARANTEE_DAYS = 30;
 
@@ -33,10 +34,24 @@ export async function recomputeEntitlement(userId: string): Promise<void> {
     )
     .limit(1);
 
+  const [before] = await db
+    .select({ entitlement: user.entitlement })
+    .from(user)
+    .where(eq(user.id, userId));
+  const entitlement = active ? "premium" : "free";
+
   await db
     .update(user)
-    .set({ entitlement: active ? "premium" : "free", updatedAt: new Date() })
+    .set({ entitlement, updatedAt: new Date() })
     .where(eq(user.id, userId));
+
+  // Removal from the channel on lapse, a fresh invite on return. It throws on a
+  // Telegram failure, so the webhook is retried until removal has happened.
+  await syncTelegramAccess(
+    userId,
+    entitlement,
+    entitlement === "premium" && before?.entitlement !== "premium",
+  );
 }
 
 export type AccountSubscription = typeof subscriptions.$inferSelect;
