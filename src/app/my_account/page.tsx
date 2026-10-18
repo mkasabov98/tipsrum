@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { SubscriptionCard } from "@/components/account/subscription-card";
+import { TelegramCard } from "@/components/account/telegram-card";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import {
   Card,
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { getAccountSubscription } from "@/lib/billing";
 import { getSession } from "@/lib/session";
+import { getTelegramLink, premiumBotLink } from "@/lib/telegram";
 
 export const metadata: Metadata = {
   title: "Моят профил | Tipsrum",
@@ -29,7 +31,12 @@ export default async function MyAccountPage() {
   if (!session) redirect("/login?redirect=/my_account");
 
   const { user } = session;
-  const subscription = await getAccountSubscription(user.id);
+  const isPremium = user.entitlement === "premium";
+  const [subscription, telegramLink, botLink] = await Promise.all([
+    getAccountSubscription(user.id),
+    getTelegramLink(user.id),
+    isPremium ? premiumBotLink(user.id) : null,
+  ]);
   const rows = [
     { label: "Имейл", value: user.email },
     {
@@ -61,9 +68,11 @@ export default async function MyAccountPage() {
           <SignOutButton />
         </CardFooter>
       </Card>
-      <SubscriptionCard
-        isPremium={user.entitlement === "premium"}
-        subscription={subscription}
+      <SubscriptionCard isPremium={isPremium} subscription={subscription} />
+      <TelegramCard
+        isPremium={isPremium}
+        botLink={botLink}
+        link={telegramLink}
       />
     </main>
   );

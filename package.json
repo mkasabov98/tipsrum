@@ -16,6 +16,9 @@
     "db:seed:posts": "tsx scripts/seed-posts.ts",
     "db:seed": "pnpm db:seed:bets && pnpm db:seed:posts",
     "stripe:setup": "tsx scripts/stripe-setup.ts",
+    "telegram:info": "tsx scripts/telegram-info.ts",
+    "telegram:poll": "tsx scripts/telegram-poll.ts",
+    "telegram:webhook": "tsx scripts/telegram-webhook.ts",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,customer.subscription.paused,customer.subscription.resumed,charge.refunded"
   },
   "dependencies": {
@@ -24,6 +27,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "grammy": "^1.46.0",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "postgres": "^3.4.9",

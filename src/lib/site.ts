@@ -75,12 +75,10 @@ export const RESPONSIBLE_GAMBLING =
   "Хазартът води до пристрастяване! Трябва да бъдете над 18 години, за да използвате нашия сайт. Бъдете разумни.";
 
 /**
- * Where members are sent on Telegram. The free group is open, so its link is
- * handed out directly. Premium goes through the bot, which gates the channel;
- * Phase 7 replaces this plain bot link with a personal one-time deep link.
+ * Where free members are sent on Telegram. The free group is open, so its link
+ * is handed out directly. Premium goes through the bot instead, with a personal
+ * START link per member (`premiumBotLink` in lib/telegram.ts).
  */
 export const TELEGRAM = {
   freeGroup: "https://t.me/tipsrumbezplaten",
-  premiumBot: "https://t.me/TipsrumPremiumBot",
-  premiumBotHandle: "@TipsrumPremiumBot",
 } as const;
