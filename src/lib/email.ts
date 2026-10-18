@@ -10,7 +10,11 @@ type EmailMessage = {
  * callers never need to change.
  */
 export async function sendEmail(message: EmailMessage): Promise<void> {
-  if (process.env.NODE_ENV === "production") {
+  // Staging opts in with EMAIL_TRANSPORT=log, so messages land in the host's logs.
+  if (
+    process.env.NODE_ENV === "production" &&
+    process.env.EMAIL_TRANSPORT !== "log"
+  ) {
     // Fail loudly: silently dropping a password-reset email is worse than an error.
     throw new Error(
       "Email transport is not configured yet (Brevo is wired in Phase 9).",
@@ -20,7 +24,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
   console.info(
     [
       "",
-      "──────── email (dev: not sent) ────────",
+      "──────── email (not sent) ────────",
       `To:      ${message.to}`,
       `Subject: ${message.subject}`,
       "",
