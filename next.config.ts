@@ -4,6 +4,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // A staging deployment sets SITE_NOINDEX=1 so search engines never list it
+  // next to the real site.
+  async headers() {
+    if (process.env.SITE_NOINDEX !== "1") return [];
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
   async redirects() {
     return [
       // The truncated percent-encoded Cyrillic slug WordPress generated for one
